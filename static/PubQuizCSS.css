@@ -1,0 +1,33 @@
+table.leaderboardClass {
+
+  border-collapse: collapse;
+  width: 100%;
+  text-align: center;
+
+}
+.leaderboardClass tr{
+background-color: #D5D8DC;
+}
+
+.leaderboardClass td,
+.leaderboardClass th {
+  border: 1px solid #000;
+  padding: 6px;
+}
+tr:nth-child(even) {background-color: #FFF;}
+
+
+.about-cont .about-bar {
+    background-color:#000;
+    border:1px solid #000;
+    color : #FFF;
+    padding: 2px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.about-cont .content {
+     background-color:#000;
+    border:1px solid #000;
+    display: none;
+    padding : 5px;
+}

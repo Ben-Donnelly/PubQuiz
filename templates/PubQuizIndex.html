@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='PubQuizCSS.css') }}">
+</head>
+  <body>
+  <div class="about-cont">
+    <div class="about-bar"><span>Register</span></div>
+        <div class="content">
+          <form method="POST">
+            <input name = "name" type="text" placeholder="Name"><br>
+            <input name = "email" type="email" placeholder="Email"><br>
+            <button type="submit" class='button'>Submit</button>
+          </form>
+    </div>
+  </div>
+    <table class="leaderboardClass" id="PQTable">
+      <tbody>
+        <tr>
+          <th>Quiz</th>
+<!--          Jinja this: Names-->
+          <th>Ben</th>
+          <th>Hazel</th>
+          <th>Craig</th>
+          <th>Meg</th>
+        </tr>
+        <tr>
+          <td>Total</td>
+<!--        Jinja this: Total scores-->
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+<!--        Jinja this: Week nums-->
+        <tr>
+          <td>week 1</td>
+        </tr>
+        <tr>
+          <td>week 2</td>
+        </tr>
+        <tr>
+          <td>week 3</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='PubQuizJS.js') }}"></script>
+</html>
