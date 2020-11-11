@@ -5,14 +5,7 @@
 </head>
   <body>
   <div class="about-cont">
-    <div class="about-bar"><span>Register</span></div>
-        <div class="content">
-          <form method="POST">
-            <input name = "name" type="text" placeholder="Name"><br>
-            <input name = "email" type="email" placeholder="Email"><br>
-            <button type="submit" class='button'>Submit</button>
-          </form>
-    </div>
+    <a class="about-bar" href="{{ url_for('reg') }}"><span>Register</span></a>
   </div>
     <table class="leaderboardClass" id="PQTable">
       <tbody>

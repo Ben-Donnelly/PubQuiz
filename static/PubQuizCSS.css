@@ -1,3 +1,4 @@
+
 table.leaderboardClass {
 
   border-collapse: collapse;
@@ -30,4 +31,55 @@ tr:nth-child(even) {background-color: #FFF;}
     border:1px solid #000;
     display: none;
     padding : 5px;
+}
+.PQRB
+{
+    background-color: #3e3e3e;
+}
+
+
+
+.PQRF
+{
+    width: 320px;
+    background: #3e3d3d;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+h1
+{
+    text-align: center;
+    color: #fff;
+    font-weight: normal;
+    margin-bottom: 20px;
+}
+
+.PQRI, .button
+{
+    width: 100%;
+    background: none;
+    border: 1px solid #fff;
+    padding: 6px 15px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    font-size: 16px; color: #fff;
+}
+
+
+.PQRI
+{
+    border: 1px solid #969696;
+    align: center;
+}
+.danger
+{
+    background-color: red;
+}
+.success
+{
+    background-color: green;
 }
