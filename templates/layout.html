@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pub Quiz Score Tracker</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='PubQuizCSS.css') }}">
+
+</head>
+<body>
+    {% include 'includes/_navbar.html' %}
+    <div class="container">
+        {% include 'includes/_messages.html' %}
+
+        {% block body %}
+        {% endblock %}
+    </div>
+
+</body>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="{{ url_for('static', filename='PubQuizJS.js') }}"></script>
+</html>

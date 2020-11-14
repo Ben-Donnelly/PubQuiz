@@ -1,0 +1,21 @@
+{% extends 'skeleton.html' %}
+{% set active_page = "results" %}
+
+{% block upload %}
+	<div>
+		<div id='resultim' class='col-md-6'>
+			<div id='resultimgrow' class='row' style='text-align:center;'>
+				<div class='col-md-12'>
+					{% for file_url in file_urls %}
+<!--					<video src="{{ file_url }}"></video>-->
+					<video width="320" height="240" controls>
+						<source src="{{ file_url }}" type="video/mp4">
+						Your browser does not support the video tag.
+					</video>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock upload%}

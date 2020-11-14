@@ -1,0 +1,7 @@
+{% extends 'skeleton.html' %}
+
+{% block upload %}
+<div id='uploadr1' class='row'>
+	<div id='col-dropzone' class='col-md-6'>{{ dropzone.create(action_view='upload') }}</div>
+</div>
+{% endblock upload%}
