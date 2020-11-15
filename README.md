@@ -16,6 +16,7 @@
  - Improve look
  - Give everyone their personalised history/stats in the dashboard
  - Registration page
+- Change secret key after final push
  ---
  ### **Future**
  - OCR for score verification

@@ -1,7 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
-#from data import articles
 from flask_mysqldb import MySQL
-from wtforms import Form, IntegerField, DateField, PasswordField, validators
+from wtforms import Form, IntegerField, DateField, PasswordField, StringField, validators
 from passlib.hash import sha256_crypt
 from functools import wraps
 
@@ -16,7 +15,6 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 mysql = MySQL(app)
 
-#articles_var = articles()
 @app.route('/')
 def index():
     return render_template('home.html')
@@ -37,30 +35,25 @@ def arts():
     articles = cur.fetchall()
 
     if result > 0:
+        #  Close connection
+        cur.close()
         return render_template("leaderboard.html", articles=articles)
     else:
+        #  Close connection
+        cur.close()
         msg = "No articles found"
         return render_template("leaderboard.html", msg=msg)
-    #  Close connection
-    cur.close()
 
 
-@app.route('/article/<string:id>/')
-def article(id):
-    cur = mysql.connection.cursor()
-
-    result = cur.execute("SELECT * FROM articles WHERE id = %s", [id])
-
-    article = cur.fetchone()
-    return render_template('article.html', article=article)
 
 class register_form(Form):
-    # name = StringField('Name', [validators.Length(min=2, max=25)])
-    # username = StringField('Username', [validators.Length(min=4, max=25)])
-    # email = StringField('Email', [validators.Length(min=6, max=40)])
+    name = StringField('Name', [validators.Length(min=2, max=25)])
+    username = StringField('Username', [validators.Length(min=4, max=25)])
+    email = StringField('Email', [validators.Length(min=6, max=40)])
     password = PasswordField('Password', [
         validators.data_required(),
-        validators.EqualTo('confirm', message='Passwords do not match.')
+        validators.EqualTo('confirm', message='Passwords do not match.'),
+        validators.length(min = 6)
     ])
     confirm = PasswordField('Confirm password')
 
@@ -125,7 +118,7 @@ def login():
             #  Close connection
 
         else:
-            cur.close()  # 16:13 in video (assume its meant to be in that else block before return)
+            cur.close()
             error_msg = "Username not found"
             return render_template("login.html", error=error_msg)
 
@@ -172,16 +165,16 @@ def dashboard():
     cur.close()
 
 
-class ArticleForm(Form):
+class ScoreForm(Form):
     score = IntegerField('Score', [validators.data_required(message="You need to enter your score as a number")])
 
     date = DateField('Date')
 
 
-@app.route("/add_article", methods=['GET', 'POST'])
+@app.route("/add/score", methods=['GET', 'POST'])
 @is_logged_in
-def add_article():
-    form = ArticleForm(request.form)
+def add_score():
+    form = ScoreForm(request.form)
     if request.method == "POST" and form.validate():
         print(request.form)
         score = request.form['score']
@@ -202,70 +195,7 @@ def add_article():
         flash("Article created", "success")
 
         return redirect(url_for("dashboard"))
-    return render_template("add_article.html", form=form)
-
-#  Edit articles
-@app.route("/edit_article/<string:id>", methods=['GET', 'POST'])
-@is_logged_in
-def edit_article(id):
-    #  Create cursor
-    cur = mysql.connection.cursor()
-
-    #  Get article by ID
-
-    result = cur.execute("SELECT * FROM articles WHERE id = %s", [id])
-
-    article = cur.fetchone()
-
-    #  Get form
-    form = ArticleForm(request.form)
-
-    #  Populate article form fields
-
-    form.title.data = article['title']
-    form.body.data = article["body"]
-
-    if request.method == "POST" and form.validate():
-        title = request.form['title']
-        body = request.form['body']
-
-        #  Create cursor
-        cur = mysql.connection.cursor()
-
-        #  Execute
-
-        cur.execute("UPDATE articles SET title = %s, body = %s WHERE id = %s", (title, body, id))
-
-        #  Commit
-        mysql.connection.commit()
-
-        #  Close
-        cur.close()
-
-        flash("Article Updated", "success")
-
-        return redirect(url_for("dashboard"))
-    return render_template("edit_article.html", form=form)
-
-# Delete articles
-@app.route('/delete_article/<string:id>',  methods=['POST'])
-@is_logged_in
-def delete_article(id):
-    #  Create cursor
-    cur = mysql.connection.cursor()
-
-    #  Execute
-    cur.execute("DELETE FROM articles WHERE id = %s", [id])
-
-    #  Commit
-    mysql.connection.commit()
-
-    #  Close
-    cur.close()
-
-    flash("Article Deleted", "success")
-
-    return redirect(url_for("dashboard"))
+    return render_template("add-score.html", form=form)
 
 if __name__ == "__main__":
     app.secret_key = '>\xcdN\x9f\xcc\x0f<\xec\xb0x\x8em~\xc6\x16\xae~?&\xc2\x81\xa9\xa1&'

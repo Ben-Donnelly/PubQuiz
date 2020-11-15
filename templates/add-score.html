@@ -1,21 +1,15 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <h1>Edit Article</h1>
-    <iframe width="420" height="315"
-src="https://www.youtube.com/embed/FhcRyaxPAps?controls=0">
-</iframe>
+    <h1 style="color:black">Add Score</h1>
     {% from "includes/_formhelpers.html" import render_field %}
     <form method="POST" action="">
-
         <div class="form-group">
-            {{ render_field(form.title, class_="form-control") }}
+            {{ render_field(form.score, class_="form-control col-2") }}
         </div>
         <div class="form-group">
-            {{ render_field(form.body, class_="form-control", id="edit") }}
+            {{ render_field(form.date, class_="form-control col-2", id="cal") }}
         </div>
         <p><input class="btn btn-primary" type="submit" value="Submit"></p>
     </form>
-
-
 {% endblock %}

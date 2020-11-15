@@ -7,3 +7,5 @@ $(".about-bar").click(function() {
     });
   });
 });
+
+$("#cal").attr('type', 'date');
