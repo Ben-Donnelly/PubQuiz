@@ -3,11 +3,12 @@ firebase = firebase.FirebaseApplication("https://pubquiztracker.firebaseio.com/"
 def post():
 
 	data = {
-		"Name": "John Doe",
-		"Email": "JohnD@gmail.com",
+		"Name" : "Test",
+		"Score": 14,
+		"Date": "16/11/2020",
 	}
 
-	result = firebase.post("/pubquiztracker/Users", data)
+	result = firebase.post("/pubquiztracker/Scores", data)
 	print(result)
 
 def retrieve():
@@ -22,3 +23,5 @@ def delete():
 	id = "-MLj7469JOGwNoDoTMB"
 	firebase.delete(f"/pubquiztracker/Users/", id)
 	print("Deleted")
+
+post()

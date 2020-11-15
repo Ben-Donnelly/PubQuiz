@@ -1,11 +1,13 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
 from flask_mysqldb import MySQL
+from firebase import firebase
+
 from wtforms import Form, IntegerField, DateField, PasswordField, StringField, validators
 from passlib.hash import sha256_crypt
 from functools import wraps
 
 app = Flask(__name__)
-
+firebase = firebase.FirebaseApplication("https://pubquiztracker.firebaseio.com/", None)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
@@ -27,6 +29,22 @@ def about():
 
 @app.route("/leaderboard")
 def arts():
+    user_result = firebase.get("/pubquiztracker/Users", "")
+    user_d = {k : v['Name'] for k, v in enumerate(user_result.values())}
+
+
+    score_result = firebase.get("/pubquiztracker/Scores", "")
+
+    dates_set = set()
+    scores_l = []
+    for k in score_result:
+        res = score_result[k]
+        dates_set.add(res['Date'])
+        scores_l.append(res['Score'])
+
+
+    user_d = {k: v['Name'] for k, v in enumerate(user_result.values())}
+
     cur = mysql.connection.cursor()
 
     #  Get articles
@@ -37,7 +55,7 @@ def arts():
     if result > 0:
         #  Close connection
         cur.close()
-        return render_template("leaderboard.html", articles=articles)
+        return render_template("leaderboard.html", headers=user_d, num_rows=len(dates_set), scores=scores_l)
     else:
         #  Close connection
         cur.close()
@@ -48,7 +66,7 @@ def arts():
 
 class register_form(Form):
     name = StringField('Name', [validators.Length(min=2, max=25)])
-    username = StringField('Username', [validators.Length(min=4, max=25)])
+    username = StringField('Username', [validators.Length(min=3, max=25)])
     email = StringField('Email', [validators.Length(min=6, max=40)])
     password = PasswordField('Password', [
         validators.data_required(),
@@ -179,20 +197,16 @@ def add_score():
         print(request.form)
         score = request.form['score']
         date = request.form['date']
-        #  Create cursor
-        cur = mysql.connection.cursor()
+        data = {
+            "Date": date,
+            "Name": session["username"],
+            "Score": score,
+        }
 
-        #  Execute
+        firebase.post("/pubquiztracker/Scores", data)
 
-        cur.execute("INSERT INTO articles (title, author, body) VALUES (%s, %s, %s)", (score, session["username"], date))
 
-        #  Commit
-        mysql.connection.commit()
-
-        #  Close
-        cur.close()
-
-        flash("Article created", "success")
+        flash("Score entered!", "success")
 
         return redirect(url_for("dashboard"))
     return render_template("add-score.html", form=form)
