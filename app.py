@@ -9,14 +9,6 @@ from functools import wraps
 app = Flask(__name__)
 firebase = firebase.FirebaseApplication("https://pubquiztracker.firebaseio.com/", None)
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'myflaskapp'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-
-mysql = MySQL(app)
-
 @app.route('/')
 def index():
     return render_template('home.html')
@@ -45,23 +37,7 @@ def arts():
 
     user_d = {k: v['Name'] for k, v in enumerate(user_result.values())}
 
-    cur = mysql.connection.cursor()
-
-    #  Get articles
-    result = cur.execute("SELECT * FROM articles")
-
-    articles = cur.fetchall()
-
-    if result > 0:
-        #  Close connection
-        cur.close()
-        return render_template("leaderboard.html", headers=user_d, num_rows=len(dates_set), scores=scores_l)
-    else:
-        #  Close connection
-        cur.close()
-        msg = "No articles found"
-        return render_template("leaderboard.html", msg=msg)
-
+    return render_template("leaderboard.html", headers=user_d, num_rows=len(dates_set), scores=scores_l)
 
 
 class register_form(Form):
@@ -86,13 +62,14 @@ def register():
         username = form.username.data
         password = sha256_crypt.encrypt(str(form.password.data))
 
-        cur = mysql.connection.cursor()
+        data = {
+            "Name": name,
+            "Email": email,
+            "Username": username,
+            "Password": password
+        }
 
-        cur.execute("INSERT INTO users(name, email, username, password) values(%s, %s, %s, %s)", (name, email, username, password))
-
-        mysql.connection.commit()
-
-        cur.close()
+        firebase.post("/pubquiztracker/Users", data)
 
         flash("Registration successful!", 'success')
 
@@ -106,23 +83,22 @@ def register():
 def login():
     if request.method == "POST":
         #  Get form fields
-        username = request.form['username']
+        email = request.form['email']
         password_candidate = request.form['password']
 
-        #  Create cursor
-        cur = mysql.connection.cursor()
+        check_pass = ""
+        username = ""
+        result = firebase.get("/pubquiztracker/Users", "")
+        for k, v in result.items():
+            pot_user = v["Email"]
+            if pot_user == email:
+                username = v['Username']
+                check_pass = v['Password']
+                break
 
-        #  Get user by username
-        result = cur.execute("SELECT * FROM users WHERE username = %s", [username])
+        if check_pass:
 
-        if result > 0:
-            # Get stored hash
-            data = cur.fetchone()
-            password = data['password']
-
-            #  Compare passwords
-
-            if sha256_crypt.verify(password_candidate, password):
+            if sha256_crypt.verify(password_candidate, check_pass):
                 #  Passed
                 session['logged_in'] = True
                 session['username'] = username
@@ -133,13 +109,9 @@ def login():
                 error_msg = "Invalid login"
                 return render_template("login.html", error=error_msg)
 
-            #  Close connection
-
         else:
-            cur.close()
-            error_msg = "Username not found"
+            error_msg = "Email or password does not match"
             return render_template("login.html", error=error_msg)
-
 
     return render_template("login.html")
 
@@ -166,21 +138,8 @@ def logout():
 @app.route("/dashboard")
 @is_logged_in
 def dashboard():
-    #  Create cursor
-    cur = mysql.connection.cursor()
+    return render_template("dashboard.html")
 
-    #  Get articles
-    result = cur.execute("SELECT * FROM articles")
-
-    articles = cur.fetchall()
-
-    if result > 0:
-        return render_template("dashboard.html", articles=articles)
-    else:
-        msg = "No articles found"
-        return render_template("dashboard.html", msg=msg)
-    #  Close connection
-    cur.close()
 
 
 class ScoreForm(Form):

@@ -12,8 +12,13 @@ def post():
 	print(result)
 
 def retrieve():
+	#-MMHz4wjFobmUs84vX8b
+	pot = 'BEN@BEN.com'
 	result = firebase.get("/pubquiztracker/Users", "")
-	print(result)
+	for k, v in result.items():
+		if v["Email"] == pot:
+			print(v)
+	# print(result)
 
 def update():
 	id = "-MLj7469JOGwNoDoTMB-"
@@ -24,4 +29,4 @@ def delete():
 	firebase.delete(f"/pubquiztracker/Users/", id)
 	print("Deleted")
 
-post()
+retrieve()
