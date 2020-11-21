@@ -1,13 +1,11 @@
-from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
-from flask_mysqldb import MySQL
+from flask import Flask, render_template, flash, redirect, url_for, session, request
 from firebase import firebase
-
 from wtforms import Form, IntegerField, DateField, PasswordField, StringField, validators
 from passlib.hash import sha256_crypt
 from functools import wraps
-
 app = Flask(__name__)
 firebase = firebase.FirebaseApplication("https://pubquiztracker.firebaseio.com/", None)
+
 
 @app.route('/')
 def index():
@@ -22,22 +20,21 @@ def about():
 @app.route("/leaderboard")
 def arts():
     user_result = firebase.get("/pubquiztracker/Users", "")
-    user_d = {k : v['Name'] for k, v in enumerate(user_result.values())}
-
 
     score_result = firebase.get("/pubquiztracker/Scores", "")
 
-    dates_set = set()
     scores_l = []
     for k in score_result:
         res = score_result[k]
-        dates_set.add(res['Date'])
-        scores_l.append(res['Score'])
+        scores_l.append(res['Scores'])
 
-
+    print(scores_l)
+    values = list(k['Scores'] for k in score_result.values())
+    values = (max(map(len, values)))
     user_d = {k: v['Name'] for k, v in enumerate(user_result.values())}
+    print(f"num_users: {user_d}\nnum_rows: {values}\nscores_l: {scores_l}")
 
-    return render_template("leaderboard.html", headers=user_d, num_rows=len(dates_set), scores=scores_l)
+    return render_template("leaderboard.html", num_users=user_d, num_rows=values, scores=scores_l)
 
 
 class register_form(Form):
@@ -47,12 +44,12 @@ class register_form(Form):
     password = PasswordField('Password', [
         validators.data_required(),
         validators.EqualTo('confirm', message='Passwords do not match.'),
-        validators.length(min = 6)
+        validators.length(min=4)
     ])
     confirm = PasswordField('Confirm password')
 
 
-@app.route("/register", methods = ["GET", "POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register():
     form = register_form(request.form)
 
@@ -69,7 +66,7 @@ def register():
             "Password": password
         }
 
-        firebase.post("/pubquiztracker/Users", data)
+        firebase.put("/pubquiztracker/Users", username, data)
 
         flash("Registration successful!", 'success')
 
@@ -77,31 +74,31 @@ def register():
 
     return render_template('register.html', form=form)
 
+
 #  Login
+def checkUser():
+    email = request.form['email']
+    result = firebase.get("/pubquiztracker/Users", "")
+    for k, v in result.items():
+        pot_user = v["Email"]
+        if pot_user == email:
+            return (v['Username'], v['Password'])
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        #  Get form fields
-        email = request.form['email']
         password_candidate = request.form['password']
-
-        check_pass = ""
-        username = ""
-        result = firebase.get("/pubquiztracker/Users", "")
-        for k, v in result.items():
-            pot_user = v["Email"]
-            if pot_user == email:
-                username = v['Username']
-                check_pass = v['Password']
-                break
-
-        if check_pass:
+        creds = checkUser()
+        if creds:
+            username = creds[0]
+            check_pass = creds[1]
 
             if sha256_crypt.verify(password_candidate, check_pass):
                 #  Passed
                 session['logged_in'] = True
                 session['username'] = username
+                session['email'] = request.form['email']
 
                 flash("You are now logged in!", 'success')
                 return redirect(url_for('dashboard'))
@@ -115,7 +112,8 @@ def login():
 
     return render_template("login.html")
 
-  # Check user logged in
+
+# Check user logged in
 def is_logged_in(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -141,11 +139,21 @@ def dashboard():
     return render_template("dashboard.html")
 
 
-
 class ScoreForm(Form):
     score = IntegerField('Score', [validators.data_required(message="You need to enter your score as a number")])
 
     date = DateField('Date')
+
+
+def getScoresForUpdate(newScore, uName):
+    try:
+        uList = firebase.get(f"/pubquiztracker/Scores/{uName}", "")['Scores']
+
+        uList.append(newScore)
+    except TypeError:
+        uList = [newScore]
+
+    return(uList)
 
 
 @app.route("/add/score", methods=['GET', 'POST'])
@@ -155,20 +163,17 @@ def add_score():
     if request.method == "POST" and form.validate():
         print(request.form)
         score = request.form['score']
-        date = request.form['date']
+        newScores = getScoresForUpdate(int(score), session["username"])
         data = {
-            "Date": date,
-            "Name": session["username"],
-            "Score": score,
+            "Scores": newScores
         }
-
-        firebase.post("/pubquiztracker/Scores", data)
-
+        firebase.put("/pubquiztracker/Scores", session["username"], data)
 
         flash("Score entered!", "success")
 
         return redirect(url_for("dashboard"))
     return render_template("add-score.html", form=form)
+
 
 if __name__ == "__main__":
     app.secret_key = '>\xcdN\x9f\xcc\x0f<\xec\xb0x\x8em~\xc6\x16\xae~?&\xc2\x81\xa9\xa1&'

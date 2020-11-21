@@ -9,7 +9,6 @@
  - Dark mode option
  - Coloured names for 1st-3rd
  - Bot to scrape link on Fridays and email to everyone
- - Connect to DB
  - Error Handling
     - Date not in future
 
@@ -23,3 +22,4 @@
 
 ### Done ✓
 - [x] Leaderboard page
+- [x]  Connect to DB

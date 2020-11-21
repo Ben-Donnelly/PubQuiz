@@ -1,35 +1,40 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<h1>Leaderboard</h1>
+<h1 style="color:black">Leaderboard</h1>
     <hr>
         <table class="leaderboardClass" id="PQTable">
       <tbody>
         <tr>
           <th>Quiz</th>
-         {% for i in headers %}
-          <th>{{ headers[i] }}</th>
+         {% for i in num_users %}
+          <th>{{ num_users[i] }}</th>
           {%- endfor -%}
         </tr>
-        <tr>
-<!--          <td>Total</td>-->
-<!--&lt;!&ndash;        Jinja this: Total scores&ndash;&gt;-->
+        {#
+<!--        <tr>-->
+<!--          <td>Week 0</td>-->
+<!--&lt;!&ndash;&lt;!&ndash;        Jinja this: Total scores&ndash;&gt;&ndash;&gt;-->
 <!--          <td>0</td>-->
 <!--          <td>0</td>-->
 <!--          <td>0</td>-->
 <!--          <td>0</td>-->
+<!--            <td>0</td>-->
 <!--        </tr>-->
 <!--        Jinja this: Week nums-->
+
+#}
         {% for week_no in range(num_rows)|reverse %}
         <tr>
           <td>Week: {{ week_no }}</td>
-          {% for j in scores %}
-           {% if j %}
-            <td>{{ j }}</td>
-           {% else %}
-            <td>0</td>
-          {% endif %}
-          {%- endfor -%}
+            {% for i in num_users %}
+            {% if i < scores | length %}
+                {% set pot_score = scores[i][week_no] %}
+                    <td>{{ pot_score }}</td>
+            {% else %}
+                <td>Waiting for score</td>
+            {% endif %}
+             {%- endfor -%}
         </tr>
         {%- endfor -%}
 
