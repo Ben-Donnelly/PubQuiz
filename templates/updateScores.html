@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1 style="color:black">Your Scores</h1>
+    <hr>
+        <table class="leaderboardClass" id="PQTable">
+      <tbody>
+        <tr>
+          <th>Quiz</th>
+          <th>{{ curr_user }}</th>
+            <th>Action</th>
+        </tr>
+
+        {% for week_no in range(num_rows)|reverse %}
+        <tr>
+            <td>Week: {{ week_no }}</td>
+            <td>{{ scores[week_no] }}</td>
+            <td><button class="btn btn-warning"> change </button></td>
+        </tr>
+        {%- endfor -%}
+
+
+      </tbody>
+    </table>
+{% endblock %}
