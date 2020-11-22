@@ -15,6 +15,9 @@
       <li class="nav-item">
         <a class="nav-link" href="/leaderboard">Leaderboard</a>
       </li>
+       <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('overall_stats') }}">Overall stats <span class="sr-only"></span></a>
+        </li>
     </ul>
 
     <ul class="navbar-nav navbar-right">
@@ -24,6 +27,9 @@
         </li>
         <li class="nav-item active">
           <a class="nav-link" href="/dashboard">Dashboard <span class="sr-only"></span></a>
+        </li>
+      <li class="nav-item">
+          <a class="nav-link" href="{{session.username}}/stats">My Stats <span class="sr-only"></span></a>
         </li>
       {% else %}
         <li class="nav-item active">
