@@ -1,4 +1,3 @@
-
 table.leaderboardClass {
 
   border-collapse: collapse;
@@ -27,7 +26,7 @@ tr:nth-child(even) {background-color: #FFF;}
     font-weight: bold;
 }
 .about-cont .content {
-     background-color:#000;
+    background-color:#000;
     border:1px solid #000;
     display: none;
     padding : 5px;
@@ -86,4 +85,9 @@ h1
 .regfr
 {
 width:350px;
+}
+
+.bt
+{
+    color: black;
 }
