@@ -11,19 +11,16 @@
           <th>{{ num_users[i] }}</th>
           {%- endfor -%}
         </tr>
-        {#
-<!--        <tr>-->
-<!--          <td>Week 0</td>-->
-<!--&lt;!&ndash;&lt;!&ndash;        Jinja this: Total scores&ndash;&gt;&ndash;&gt;-->
-<!--          <td>0</td>-->
-<!--          <td>0</td>-->
-<!--          <td>0</td>-->
-<!--          <td>0</td>-->
-<!--            <td>0</td>-->
-<!--        </tr>-->
-<!--        Jinja this: Week nums-->
 
-#}
+
+        <tr>
+            <td>Total</td>
+            {% for i in num_users %}
+            <td>{{ tot_scores[i] }}</td>
+                    {%- endfor -%}
+        </tr>
+
+
         {% for week_no in range(num_rows)|reverse %}
         <tr>
           <td>Week: {{ week_no }}</td>
