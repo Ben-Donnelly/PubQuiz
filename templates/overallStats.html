@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1 class="text-secondary">See how you stack up!</h1>
+<hr>
+<div class="container">
+    <img class= "mx-auto d-block" src="data:image/png;base64, {{ plot_url }}">
+</div>
+{% endblock %}
