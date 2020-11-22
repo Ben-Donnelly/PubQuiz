@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h1 class="text-secondary">Stats for {{ curr_user }}</h1>
+<hr>
+<div class="container">
+    <img class= "mx-auto d-block" src="data:image/png;base64, {{ plot_url }}">
+    <p>Your average score is: {{ score_stats[0] }}</p>
+    <p>Your best score is: {{ score_stats[1] }}</p>
+    <p>Your worst score is: {{ score_stats[2] }}</p>
+</div>
+{% endblock %}
