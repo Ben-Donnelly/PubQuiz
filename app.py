@@ -8,8 +8,18 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import base64
+from flask_caching import Cache
+
+config = {
+    "DEBUG": True,          # some Flask specific configs
+    "CACHE_TYPE": "simple", # Flask-Caching related configs
+    "CACHE_DEFAULT_TIMEOUT": 3600
+}
 
 app = Flask(__name__)
+app.config.from_mapping(config)
+cache = Cache(app)
+
 firebase = firebase.FirebaseApplication("https://pubquiztracker.firebaseio.com/", None)
 
 
@@ -24,6 +34,7 @@ def about():
 
 
 @app.route("/leaderboard")
+@cache.cached()
 def arts():
     user_result = firebase.get("/pubquiztracker/Users", "")
 
@@ -167,6 +178,9 @@ def getScoresForUpdate(newScore, uName):
 @is_logged_in
 def add_score():
     form = ScoreForm(request.form)
+
+    cache.clear()
+
     if request.method == "POST" and form.validate():
         print(request.form)
         score = request.form['score']
@@ -197,7 +211,8 @@ def update_scores():
     return render_template("updateScores.html", curr_user=session['username'], num_rows=values, scores=scores_l)
     # return render_template("updateScores.html", curr_user=session['username'], num=getScoresForUpdate)
 
-@app.route(f"/<string:curr_user>/stats")
+@app.route(f"/<string:curr_user>_stats")
+@cache.cached()
 @is_logged_in
 def stats(curr_user):
     score_result = firebase.get(f"/pubquiztracker/Scores/{session['username']}", "")
@@ -218,20 +233,26 @@ def stats(curr_user):
 
     score_stats = [average, best, worst]
 
-    plt.plot(x, scores_l, '--ko')
 
+    plt.plot(x, scores_l, '--ko', label="Your scores")
+    plt.hlines(y=average, xmin=0, xmax=len(scores_l)-1, label="Average")
+    # plt.legend(bbox_to_anchor=(1, 1), loc="center left", borderaxespad=0)
+    plt.legend()
     plt.savefig(img, format='png')
     plt.close()
     img.seek(0)
     plot_url = base64.b64encode(img.getvalue()).decode('utf8')
 
+
     return render_template('curUserStats.html', plot_url=plot_url, curr_user=session['username'], score_stats=score_stats)
 
 @app.route(f"/overall/stats")
 @is_logged_in
+@cache.cached()
 def overall_stats():
     score_result = firebase.get(f"/pubquiztracker/Scores", "")
     img = BytesIO()
+    img1 = BytesIO()
 
     # Hacky (works so good enough for now), ****FIX LATER****
     x = list(score_result.keys())
@@ -253,9 +274,14 @@ def overall_stats():
     plt.savefig(img, format='png')
     plt.close()
     img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode('utf8')
+    pie_url = base64.b64encode(img.getvalue()).decode('utf8')
 
-    return render_template('overallStats.html', curr_user=session['username'], plot_url=plot_url)
+    plt.barh(x, y)
+    plt.savefig(img1, format='png')
+    plt.close()
+    img.seek(0)
+    bar_url = base64.b64encode(img1.getvalue()).decode('utf8')
+    return render_template('overallStats.html', pie_url=pie_url, bar_url=bar_url)
 
 # with app.test_request_context():
 #     print(url_for('overall_stats'))
