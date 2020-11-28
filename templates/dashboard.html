@@ -1,10 +1,11 @@
 {% extends "layout.html" %}
 
+
 {% block body %}
 <h1 style="color:black">Welcome {{session.username}}</h1>
-<a class="btn btn-success" href="/add/score">Add Score</a>
-<a class="btn btn-success" href="/update/scores">Update Scores</a>
-<a class="btn btn-success" href="{{ url_for('overall_stats')}}">Stats</a>
+<a class="btn" href="/add/score">Add Score</a>
+<a class="btn" href="/update/scores">Update Scores</a>
+<a class="btn" href="{{ url_for('overall_stats')}}">Stats</a>
 <hr>
 
 {% endblock %}

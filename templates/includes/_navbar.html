@@ -29,7 +29,7 @@
           <a class="nav-link" href="/dashboard">Dashboard <span class="sr-only"></span></a>
         </li>
       <li class="nav-item">
-          <a class="nav-link" href="{{session.username}}/stats">My Stats <span class="sr-only"></span></a>
+          <a class="nav-link" href="{{ url_for('stats', curr_user=session.username) }}">My Stats <span class="sr-only"></span></a>
         </li>
       {% else %}
         <li class="nav-item active">
