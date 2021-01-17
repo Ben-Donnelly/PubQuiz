@@ -12,16 +12,8 @@ from flask_caching import Cache
 import matplotlib
 matplotlib.use('Agg')
 
-
-config = {
-    "DEBUG": True,
-    "CACHE_TYPE": "simple",
-    "CACHE_DEFAULT_TIMEOUT": 3600
-}
-
 # AWS WSGI looks for application by default
 application = app = Flask(__name__)
-app.config.from_mapping(config)
 cache = Cache(app)
 
 firebase = firebase.FirebaseApplication("https://pubquiztracker.firebaseio.com/", None)
@@ -297,4 +289,4 @@ def overall_stats():
 
 if __name__ == "__main__":
     app.secret_key = '>\xcdN\x9f\xcc\x0f<\xec\xb0x\x8em~\xc6\x16\xae~?&\xc2\x81\xa9\xa1&'
-    app.run(debug=True)
+    app.run()
