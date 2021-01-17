@@ -11,10 +11,11 @@ import base64
 from flask_caching import Cache
 import matplotlib
 matplotlib.use('Agg')
-app.config['SECRET_KEY'] = '>\xcdN\x9f\xcc\x0f<\xec\xb0x\x8em~\xc6\x16\xae~?&\xc2\x81\xa9\xa1&'
 
 # AWS WSGI looks for application by default
-application = app = Flask(__name__)
+app = Flask(__name__)
+app.config['SECRET_KEY'] = '>\xcdN\x9f\xcc\x0f<\xec\xb0x\x8em~\xc6\x16\xae~?&\xc2\x81\xa9\xa1&'
+
 cache = Cache(app)
 
 firebase = firebase.FirebaseApplication("https://pubquiztracker.firebaseio.com/", None)
