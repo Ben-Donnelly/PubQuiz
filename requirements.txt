@@ -7,3 +7,4 @@ matplotlib==3.3.3
 passlib==1.7.4
 WTForms==2.3.3
 gunicorn==20.0.4
+python-jwt==3.3.0
