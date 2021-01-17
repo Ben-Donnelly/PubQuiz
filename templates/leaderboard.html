@@ -3,38 +3,34 @@
 {% block body %}
 <h1 style="color:black">Leaderboard</h1>
     <hr>
-        <table class="leaderboardClass" id="PQTable">
+    <table class="leaderboardClass" id="PQTable">
       <tbody>
         <tr>
           <th>Quiz</th>
-         {% for i in num_users %}
-          <th>{{ num_users[i] }}</th>
+          {% for i in num_users %}
+            <th>{{ num_users[i] }}</th>
           {%- endfor -%}
         </tr>
-
-
         <tr>
             <td>Total</td>
             {% for i in num_users %}
-            <td>{{ tot_scores[i] }}</td>
-                    {%- endfor -%}
+              <td>{{ tot_scores[i] }}</td>
+            {%- endfor -%}
         </tr>
-
 
         {% for week_no in range(num_rows)|reverse %}
         <tr>
-          <td>Week: {{ week_no }}</td>
+          <td>Week: {{ week_no + 1 }}</td>
             {% for i in num_users %}
-            {% if i < scores | length %}
-                {% set pot_score = scores[i][week_no] %}
+            {% set pot_score = scores[i][week_no] %}
+                {% if pot_score %}
                     <td>{{ pot_score }}</td>
-            {% else %}
-                <td>Waiting for score</td>
-            {% endif %}
-             {%- endfor -%}
+                {% else %}
+                    <td>{{ num_users[i] }} has not yet completed this quiz </td>
+                {% endif %}
+            {%- endfor -%}
         </tr>
         {%- endfor -%}
-
       </tbody>
     </table>
 {% endblock %}

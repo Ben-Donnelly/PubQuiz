@@ -1,5 +1,5 @@
 table.leaderboardClass {
-
+ table-layout:fixed;
   border-collapse: collapse;
   width: 100%;
   text-align: center;
@@ -106,6 +106,7 @@ h1
 }
 .btn:hover {
   box-shadow: 0 12px 16px #ffc627, 0 17px 80px 0 #ffc627;
+  text-shadow: 0px 0px transparent, 0px 0px #ffc627;
 }
 
 .navbar-dark {
@@ -125,4 +126,11 @@ h1
 
 .navbar-brand{
 border: none;
+}
+
+.labels{
+    color:white;
+    margin: 0px 0px 0px 0px;
+    position: relative;
+    top: -20px;
 }

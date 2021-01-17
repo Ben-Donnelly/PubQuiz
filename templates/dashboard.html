@@ -2,9 +2,9 @@
 
 
 {% block body %}
-<h1 style="color:black">Welcome {{session.username}}</h1>
-<a class="btn" href="/add/score">Add Score</a>
-<a class="btn" href="/update/scores">Update Scores</a>
+<h1 style="color:white">Welcome {{session.username}}</h1>
+<a class="btn" href="{{url_for('add_score')}}">Add Score</a>
+<a class="btn" href="{{url_for('update_scores')}}">Update Scores</a>
 <a class="btn" href="{{ url_for('overall_stats')}}">Stats</a>
 <hr>
 
