@@ -11,6 +11,7 @@ import base64
 from flask_caching import Cache
 import matplotlib
 matplotlib.use('Agg')
+app.config['SECRET_KEY'] = '>\xcdN\x9f\xcc\x0f<\xec\xb0x\x8em~\xc6\x16\xae~?&\xc2\x81\xa9\xa1&'
 
 # AWS WSGI looks for application by default
 application = app = Flask(__name__)
@@ -288,5 +289,4 @@ def overall_stats():
 
 
 if __name__ == "__main__":
-    app.secret_key = '>\xcdN\x9f\xcc\x0f<\xec\xb0x\x8em~\xc6\x16\xae~?&\xc2\x81\xa9\xa1&'
     app.run()
