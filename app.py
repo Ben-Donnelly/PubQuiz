@@ -69,6 +69,9 @@ class RegisterForm(Form):
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    flash("This application was made for a small number of people and so no new users are able to register at this "
+          "point. Please contact the site owner if you have any questions. This page is left in for "
+          "demonstration purposes only", 'warning')
     form = RegisterForm(request.form)
 
     if request.method == "POST" and form.validate():
@@ -83,11 +86,6 @@ def register():
             "Username": username,
             "Password": password
         }
-
-        firebase.put("/pubquiztracker/Users", username, data)
-
-        flash("Registration successful!", 'success')
-
         return redirect(url_for('login'))
 
     return render_template('register.html', form=form)

@@ -8,4 +8,5 @@ $(".about-bar").click(function() {
   });
 });
 
-$("#cal").attr('type', 'date');
+$("#regForm :input").prop("disabled", true);
+$("#regFormSubBut").prop("disabled", true);
