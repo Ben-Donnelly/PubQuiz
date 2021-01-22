@@ -1,8 +1,8 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, request
 from firebase import firebase
 from datetime import date as sys_date
-from wtforms import Form, IntegerField, DateField, PasswordField, StringField, validators, ValidationError
-from wtforms.fields.html5 import EmailField
+from wtforms import Form, IntegerField, PasswordField, StringField, validators, ValidationError
+from wtforms.fields.html5 import EmailField, DateField
 from passlib.hash import sha256_crypt
 from functools import wraps
 from io import BytesIO
@@ -170,14 +170,13 @@ def get_scores_for_update(new_score, u_name):
 
 class ScoreForm(Form):
     score = IntegerField("Score", [validators.data_required(message="You need to enter your score as a number")])
-    date = DateField("Date", format='%Y-%m-%d')
+    date = DateField("Date")
 
 
 @app.route("/add/score", methods=['GET', 'POST'])
 @is_logged_in
 def add_score():
     form = ScoreForm(request.form)
-
     cache.clear()
 
     if request.method == "POST" and form.validate():
@@ -288,4 +287,4 @@ def overall_stats():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
