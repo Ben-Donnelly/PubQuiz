@@ -1,15 +1,17 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, request
 from firebase import firebase
 from datetime import date as sys_date
-from wtforms import Form, IntegerField, PasswordField, StringField, validators, ValidationError
+from wtforms import Form, IntegerField, PasswordField, StringField, validators
 from wtforms.fields.html5 import EmailField, DateField
 from passlib.hash import sha256_crypt
 from functools import wraps
 from io import BytesIO
 import matplotlib.pyplot as plt
-import base64
+from base64 import b64encode
 from flask_caching import Cache
 import matplotlib
+from statistics import mean
+from numpy import arange
 matplotlib.use('Agg')
 
 # AWS WSGI looks for application by default
@@ -31,10 +33,14 @@ def about():
     return render_template('about.html')
 
 
+def get_required_data(parent_dir="Scores", user_name="", endpoint=""):
+    return firebase.get(f"/pubquiztracker/{parent_dir}/{user_name}", endpoint)
+
+
 @app.route("/leaderboard")
 @cache.cached()
 def leaderboard():
-    score_result = firebase.get("/pubquiztracker/Scores", "")
+    score_result = get_required_data()
 
     scores_l = []
     m_rows = 0
@@ -46,7 +52,7 @@ def leaderboard():
 
         # If 1 person has done 10 quizzes but another only 1 | 2 | 3 | ... | 9
         # We still need 10 rows
-        m_rows = max(m_rows, len(v['Scores']))
+        m_rows = max(m_rows, v['num_entries'])
 
     # Use of dictionary for better integrity
     user_d = {k: v for k, v in enumerate(list(score_result.keys()))}
@@ -76,31 +82,17 @@ def register():
           "demonstration purposes only", 'warning')
     form = RegisterForm(request.form)
 
-    if request.method == "POST" and form.validate():
-        name = form.name.data
-        email = form.email.data
-        username = form.username.data
-        password = sha256_crypt.encrypt(str(form.password.data))
-
-        data = {
-            "Name": name,
-            "Email": email,
-            "Username": username,
-            "Password": password
-        }
-        return redirect(url_for('login'))
-
     return render_template('register.html', form=form)
 
 
 #  Login
 def check_user():
     email = request.form['email']
-    result = firebase.get("/pubquiztracker/Users", "")
+    result = get_required_data(parent_dir="Users")
     for k, v in result.items():
         pot_user = v["Email"]
         if pot_user == email:
-            return (v['Username'], v['Password'])
+            return v['Username'], v['Password']
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -116,7 +108,6 @@ def login():
                 #  Passed
                 session['logged_in'] = True
                 session['username'] = username
-                session['email'] = request.form['email']
 
                 flash("You are now logged in!", 'success')
                 return redirect(url_for('dashboard'))
@@ -146,8 +137,9 @@ def is_logged_in(f):
 @app.route("/logout")
 @is_logged_in
 def logout():
+    curr_user = session['username']
     session.clear()
-    flash("You have been successfully logged out!", "success")
+    flash(f"You have been successfully logged out!\nBye {curr_user}! 😥", "success")
     return redirect(url_for("login"))
 
 
@@ -159,11 +151,13 @@ def dashboard():
 
 def get_scores_for_update(new_score, u_name):
     try:
-        u_list = firebase.get(f"/pubquiztracker/Scores/{u_name}", "")['Scores']
-
+        # Gets all scores list for current user
+        u_list = get_required_data(user_name=u_name)['Scores']
+        # Adds new score
         u_list.append(new_score)
     except TypeError:
-        u_list = [new_score]
+        flash("Something went wrong, tell Ben and give him the values you put in for score and date!", "danger")
+        return redirect(url_for("add_score"))
 
     return u_list
 
@@ -173,49 +167,56 @@ class ScoreForm(Form):
     date = DateField("Date")
 
 
+def update_user_average(scores_l):
+    # Gets number of quizzes completed and computes the new average
+
+    # The new score has already been added, saves call to db
+    curr_num_of_scores = len(scores_l)
+    new_average = round(mean(scores_l), 2)
+
+    return [new_average, curr_num_of_scores]
+
+
 @app.route("/add/score", methods=['GET', 'POST'])
 @is_logged_in
 def add_score():
     form = ScoreForm(request.form)
+    # Clear cache so that the leaderboard will be updated
     cache.clear()
 
     if request.method == "POST" and form.validate():
-        print(request.form)
-        score = request.form['score']
+
+        score = form.score.data
         date = form.date.data
 
+        # If date in future, retry
         if date > sys_date.today():
             flash("Date cannot be in the future!", "danger")
             return redirect(url_for("add_score"))
 
-        new_score = get_scores_for_update(int(score), session["username"])
+        # Don't need else as redirects if > today's date
+        new_score = get_scores_for_update(score, session["username"])
+
+        # below gives: list: [new_average, new_num_entries]
+        new_entries = update_user_average(new_score)
         data = {
-            "Scores": new_score
+            "Average": new_entries[0],
+            "Scores": new_score,
+            "num_entries": new_entries[1]
         }
 
+        # Update the scores
         firebase.put("/pubquiztracker/Scores", session["username"], data)
-
         flash("Score entered!", "success")
 
         return redirect(url_for("dashboard"))
     return render_template("add-score.html", form=form)
 
 
-@app.route("/update/scores")
-@is_logged_in
-@cache.cached()
-def update_scores():
-    flash("This page is currently being implemented, no functionality is available yet!", "info")
-
-    score_result = firebase.get(f"/pubquiztracker/Scores/{session['username']}", "")
-
-    scores_l = []
-    for k in score_result:
-        scores_l = score_result[k]
-
-    values = len(scores_l)
-
-    return render_template("updateScores.html", curr_user=session['username'], num_rows=values, scores=scores_l)
+def all_average():
+    score_result = get_required_data()
+    average_lis = [v['Average'] for v in score_result.values()]
+    return average_lis
 
 
 @app.route(f"/<string:curr_user>_stats")
@@ -224,17 +225,16 @@ def update_scores():
 def stats(curr_user):
     fig, ax = plt.subplots()
 
-    score_result = firebase.get(f"/pubquiztracker/Scores/{curr_user}", "")
+    score_result = get_required_data(user_name=curr_user)
 
-    scores_l = []
-    for k in score_result:
-        scores_l = score_result[k]
+    scores_l = score_result['Scores']
 
     img = BytesIO()
-    len_scores = len(scores_l)
+    len_scores = score_result['num_entries']
     x = [f"{i+1}" for i in range(len_scores)]
 
-    average = sum(scores_l) / len_scores
+    average = round(mean(scores_l), 2)
+
     # Don't want to return e.g 20.0, but do want to return e.g 20.5
     # So if the value is x.0, then just cast to int
     if average.is_integer():
@@ -253,37 +253,68 @@ def stats(curr_user):
     plt.savefig(img, format='png')
     plt.close()
     img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode('utf8')
+    plot_url = b64encode(img.getvalue()).decode('utf8')
 
-    return render_template('curUserStats.html', plot_url=plot_url, curr_user=session['username'], score_stats=s_stats)
+    return render_template('curUserStats.html', plot_url=plot_url, curr_user=curr_user, score_stats=s_stats)
 
 
 @app.route(f"/overall/stats")
 @is_logged_in
 @cache.cached()
 def overall_stats():
-    score_result = firebase.get(f"/pubquiztracker/Scores", "")
-    img = BytesIO()
-    img1 = BytesIO()
+    # Data for the overall stats page
+    score_result = get_required_data()
+
+    # Inits graphs
+    pie_img = BytesIO()
+    barh_img = BytesIO()
+    barv_img = BytesIO()
 
     graph_usernames = list(score_result.keys())
+
+    # Gets total scores for each user
     graph_scores = list(sum(i['Scores']) for i in score_result.values())
 
+    # Gets the average score for each user
+    all_avg_lis = all_average()
+    avg_of_avg = mean(all_avg_lis)
     fig1, ax1 = plt.subplots()
-    ax1.pie(graph_scores, labels=graph_usernames, startangle=90)
-    ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
-    plt.savefig(img, format='png')
-    plt.close()
-    img.seek(0)
-    pie_url = base64.b64encode(img.getvalue()).decode('utf8')
+    custom_colours = ['#2631C3', '#AF33FF', '#F5B31E', '#F115CC', '#FF0000', '#00FFF5', '#F4FF00']
+    # pie chart
+    ax1.pie(graph_scores, labels=graph_usernames, startangle=90, colors=custom_colours)
+    # Equal aspect ratio ensures that pie is drawn as a circle.
+    ax1.axis('equal')
 
-    plt.barh(graph_usernames, graph_scores)
-    plt.savefig(img1, format='png')
+    plt.savefig(pie_img, format='png')
     plt.close()
-    img.seek(0)
-    bar_url = base64.b64encode(img1.getvalue()).decode('utf8')
-    return render_template('overallStats.html', pie_url=pie_url, bar_url=bar_url)
+    pie_img.seek(0)
+    pie_url = b64encode(pie_img.getvalue()).decode('utf8')
+
+    # Horizontal bar chart
+    plt.barh(graph_usernames, graph_scores, color=custom_colours)
+    plt.savefig(barh_img, format='png')
+    plt.close()
+    barh_img.seek(0)
+    bar_url = b64encode(barh_img.getvalue()).decode('utf8')
+
+    # Vertical bar chart
+    plt.bar(graph_usernames, all_avg_lis, color=custom_colours)
+
+    # The average of averages line
+    plt.hlines(y=avg_of_avg, xmin=0, xmax=len(all_avg_lis)-1, label="Average of averages", colors='black')
+    plt.title("Average scores")
+    plt.legend()
+
+    # Sets y-axis to go from 0 up to the maximun score + 1 so that there is an upper limit on the graph
+
+    plt.yticks(arange(0, max(all_avg_lis)+2, 1))
+    plt.savefig(barv_img, format='png')
+    plt.close()
+    barv_img.seek(0)
+    avg_url = b64encode(barv_img.getvalue()).decode('utf8')
+
+    return render_template('overallStats.html', pie_url=pie_url, bar_url=bar_url, avg_scores_url=avg_url)
 
 
 if __name__ == "__main__":
