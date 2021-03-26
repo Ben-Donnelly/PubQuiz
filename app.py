@@ -231,13 +231,13 @@ def stats(curr_user):
 
     img = BytesIO()
     len_scores = score_result['num_entries']
-    x = [f"{i+1}" for i in range(len_scores)]
+    x = [f"{i + 1}" for i in range(len_scores)]
 
     average = round(mean(scores_l), 2)
 
     # Don't want to return e.g 20.0, but do want to return e.g 20.5
     # So if the value is x.0, then just cast to int
-    if average.is_integer():
+    if isinstance(average, int):
         average = int(average)
 
     best = max(scores_l)
@@ -257,30 +257,11 @@ def stats(curr_user):
 
     return render_template('curUserStats.html', plot_url=plot_url, curr_user=curr_user, score_stats=s_stats)
 
-
-@app.route(f"/overall/stats")
-@is_logged_in
-@cache.cached()
-def overall_stats():
-    # Data for the overall stats page
-    score_result = get_required_data()
-
-    # Inits graphs
+def pie_chart(graph_usernames, custom_colours, graph_scores):
     pie_img = BytesIO()
-    barh_img = BytesIO()
-    barv_img = BytesIO()
 
-    graph_usernames = list(score_result.keys())
-
-    # Gets total scores for each user
-    graph_scores = list(sum(i['Scores']) for i in score_result.values())
-
-    # Gets the average score for each user
-    all_avg_lis = all_average()
-    avg_of_avg = mean(all_avg_lis)
     fig1, ax1 = plt.subplots()
 
-    custom_colours = ['#2631C3', '#AF33FF', '#F5B31E', '#F115CC', '#FF0000', '#00FFF5', '#F4FF00']
     # pie chart
     ax1.pie(graph_scores, labels=graph_usernames, startangle=90, colors=custom_colours)
     # Equal aspect ratio ensures that pie is drawn as a circle.
@@ -291,15 +272,30 @@ def overall_stats():
     pie_img.seek(0)
     pie_url = b64encode(pie_img.getvalue()).decode('utf8')
 
+    return pie_url
+
+def barh_chart(graph_usernames, custom_colours, graph_scores):
+    barh_img = BytesIO()
+
     # Horizontal bar chart
     plt.barh(graph_usernames, graph_scores, color=custom_colours)
     plt.savefig(barh_img, format='png')
     plt.close()
     barh_img.seek(0)
-    bar_url = b64encode(barh_img.getvalue()).decode('utf8')
+
+    return b64encode(barh_img.getvalue()).decode('utf8')
+
+def barv_chart(graph_usernames, score_result, custom_colours):
+    barv_img = BytesIO()
+
+    labels = list(f"{i} ({score_result[i]['Average']})" for i in graph_usernames)
+
+    # Gets the average score for each user
+    all_avg_lis = all_average()
+    avg_of_avg = mean(all_avg_lis)
 
     # Vertical bar chart
-    plt.bar(graph_usernames, all_avg_lis, color=custom_colours)
+    plt.bar(labels, all_avg_lis, color=custom_colours)
 
     # The average of averages line
     plt.hlines(y=avg_of_avg, xmin=0, xmax=len(all_avg_lis)-1, label="Average of averages", colors='black')
@@ -312,9 +308,51 @@ def overall_stats():
     plt.savefig(barv_img, format='png')
     plt.close()
     barv_img.seek(0)
-    avg_url = b64encode(barv_img.getvalue()).decode('utf8')
+    return b64encode(barv_img.getvalue()).decode('utf8')
 
-    return render_template('overallStats.html', pie_url=pie_url, bar_url=bar_url, avg_scores_url=avg_url)
+def overall_avgs_chart(graph_usernames, score_result, custom_colours):
+    fig, ax = plt.subplots()
+
+    img = BytesIO()
+    len_scores = score_result[next(iter(score_result))]['num_entries']
+    x = [f"{i + 1}" for i in range(len_scores)]
+
+    y = [score_result[i]['Scores'] for i in graph_usernames]
+
+    for i in range(len(graph_usernames)):
+        l1, = plt.plot(x, [i for i in y[i]], '--o', label=graph_usernames[i])
+        l1.set_color(custom_colours[i])
+    plt.ylim([0, 26])
+
+    ax.set_xlabel('Week No.')
+
+    plt.legend()
+    plt.savefig(img, format='png')
+    plt.close()
+    img.seek(0)
+    return b64encode(img.getvalue()).decode('utf8')
+
+    # return render_template('curUserStats.html', plot_url=plot_url, curr_user=curr_user, score_stats=s_stats)
+
+@app.route(f"/overall/stats")
+@is_logged_in
+@cache.cached()
+def overall_stats():
+    # Data for the overall stats page
+    score_result = get_required_data()
+    usernames = list(score_result.keys())
+    custom_colours = ['#2631C3', '#AF33FF', '#F5B31E']
+
+    # Gets total scores for each user
+    graph_scores = list(sum(i['Scores']) for i in score_result.values())
+
+    # graphs
+    pie_img = pie_chart(usernames, custom_colours, graph_scores)
+    barh_img = barh_chart(usernames, custom_colours, graph_scores)
+    barv_img = barv_chart(usernames, score_result, custom_colours)
+    line_img = overall_avgs_chart(usernames, score_result, custom_colours)
+
+    return render_template('overallStats.html', pie_url=pie_img, bar_url=barh_img, avg_scores_url=barv_img, line_url=line_img)
 
 
 if __name__ == "__main__":
