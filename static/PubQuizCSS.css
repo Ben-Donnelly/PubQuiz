@@ -136,6 +136,7 @@ border: none;
 }
 .imgContainer{
     float: left;
-    width: 550px;
+    width: 50%;
     margin-bottom: 10px;
+    padding: 5px;
 }
