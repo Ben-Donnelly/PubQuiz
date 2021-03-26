@@ -3,16 +3,37 @@
 {% block body %}
 <h1 class="text-secondary">See how you stack up!</h1>
 <hr>
-<div class="container">
-    <img class= "mx-auto d-block" src="data:image/png;base64, {{ pie_url }}">
+<!--<div class="container">-->
+<!--    <img class= "mx-auto d-block" src="data:image/png;base64, {{ pie_url }}">-->
+<!--</div>-->
+<!--<br>-->
+<!--<div class="container">-->
+<!--    <img class= "mx-auto d-block" src="data:image/png;base64, {{ bar_url }}">-->
+<!--</div>-->
+<!--<br>-->
+<!--<div class="container">-->
+<!--    <img class= "mx-auto d-block" src="data:image/png;base64, {{ avg_scores_url }}">-->
+<!--</div>-->
+
+<div class="imgContainer">
+    <img src="data:image/png;base64, {{ pie_url }}" width="500" />
+</div>
+<div class="imgContainer">
+    <img src="data:image/png;base64, {{ bar_url }} " width="500" />
 </div>
 <br>
-<div class="container">
-    <img class= "mx-auto d-block" src="data:image/png;base64, {{ bar_url }}">
+<div class="imgContainer">
+     <img src="data:image/png;base64, {{ avg_scores_url }}" width="500"/>
+    <p>This is image 3</p>
 </div>
-<br>
-<div class="container">
-    <img class= "mx-auto d-block" src="data:image/png;base64, {{ avg_scores_url }}">
+<div class="imgContainer">
+     <img src="data:image/png;base64, {{ line_url }}" width="500"/>
+    <p>This is image 3</p>
 </div>
+
+<!--    <div class="container">-->
+<!--    <img class= "mx-auto d-block" src="data:image/png;base64, {{ avg_scores_url }}">-->
+<!--</div>-->
+
 
 {% endblock %}
