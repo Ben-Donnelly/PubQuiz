@@ -11,7 +11,7 @@ from base64 import b64encode
 from flask_caching import Cache
 import matplotlib
 from statistics import mean
-from numpy import arange
+import numpy as np
 matplotlib.use('Agg')
 
 # AWS WSGI looks for application by default
@@ -304,7 +304,7 @@ def barv_chart(graph_usernames, score_result, custom_colours):
 
     # Sets y-axis to go from 0 up to the maximun score + 1 so that there is an upper limit on the graph
 
-    plt.yticks(arange(0, max(all_avg_lis)+2, 1))
+    plt.yticks(np.arange(0, max(all_avg_lis)+2, 1))
     plt.savefig(barv_img, format='png')
     plt.close()
     barv_img.seek(0)
@@ -315,12 +315,16 @@ def overall_avgs_chart(graph_usernames, score_result, custom_colours):
 
     img = BytesIO()
     len_scores = score_result[next(iter(score_result))]['num_entries']
-    x = [f"{i + 1}" for i in range(len_scores)]
 
-    y = [score_result[i]['Scores'] for i in graph_usernames]
+    x = [f"{i + 1}" for i in range(len_scores)]
+    print(x)
+    # min_weeks =
+    num_of_weeks = [score_result[i]['Scores'] for i in graph_usernames]
+
 
     for i in range(len(graph_usernames)):
-        l1, = plt.plot(x, [i for i in y[i]], '--o', label=graph_usernames[i])
+        y = [i for i in num_of_weeks[i]]
+        l1, = ax.plot(x[:len(y)], y, '--o', label=graph_usernames[i])
         l1.set_color(custom_colours[i])
     plt.ylim([0, 26])
 
