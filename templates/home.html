@@ -1,13 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <div class="jumbotron text-center">
-        <h1 class="bt">Pub Quiz Score Tracker</h1>
+    <div class="text-center">
+        <h1 class="wb">Pub Quiz Score Tracker</h1>
 
-        <p class="lead">Yes I finally did it</p>
-        {% if session.logged_in == NULL %}
-            <a href="/register" class="btn btn-lg">Register</a>
-            <a href="/login" class="btn btn-lg">Login</a>
+        <p>Yes I finally did it</p>
+        {% if not session.logged_in %}
+            <a href="/register" class="btn btn-lg wb">Register <i class="fas fa-user-plus"></i></a>
+            <a href="/login" class="btn btn-lg wb">Login <i class="fas fa-sign-in-alt"></i></a>
         {% endif %}
     </div>
 {% endblock %}

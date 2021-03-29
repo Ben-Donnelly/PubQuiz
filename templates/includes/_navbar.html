@@ -1,46 +1,232 @@
-<nav class="navbar navbar-expand-md navbar-dark bg-dark border-bottom">
-  <a class="navbar-brand" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
+<!DOCTYPE html>
+<html lang="en">
 
-  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark wb">
+  <a class="navbar-brand" href="#"></a>
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarSupportedContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-
+      <li class="nav-item">
+        <a class="nav-link wb" href="{{ url_for('index') }}">Home <i class="fas fa-igloo"></i></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('about') }}">About</a>
+        <a class="nav-link wb" href="{{ url_for('about') }}">About <i class="fas fa-question-circle"></i></a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('leaderboard') }}">Leaderboard</a>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle wb" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Actions
+        </a>
+        <br>
+        <div class="dropdown-menu wb ml-auto" aria-labelledby="navbarDropdown">
+          <a class="liffs text-justify" href="{{ url_for('leaderboard') }}">Leaderboard <i class="fas fa-flag-checkered"></i></a>
+          <div class="dropdown-divider"></div>
+          <a class="liffs" href="{{ url_for('overall_stats') }}">Overall stats <i class="fas fa-chart-bar"></i>
+          </a><div class="dropdown-divider"></div>
+          <a class="liffs" href="{{ url_for('stats', curr_user=session.username) }}">My Stats <i class="fas fa-user-astronaut"></i></a>
+        </div>
       </li>
-       <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('overall_stats') }}">Overall stats <span class="sr-only"></span></a>
-        </li>
     </ul>
+    <div class="nav-item">
 
-    <ul class="navbar-nav navbar-right">
-      {% if session.logged_in %}
-        <li class="nav-item active">
-          <a class="nav-link" href="{{ url_for('logout') }}">Logout <span class="sr-only"></span></a>
-        </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard <span class="sr-only"></span></a>
-        </li>
-      <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('stats', curr_user=session.username) }}">My Stats <span class="sr-only"></span></a>
-        </li>
-      {% else %}
-        <li class="nav-item active">
-          <a class="nav-link" href="{{ url_for('register') }}">Register <span class="sr-only"></span></a>
-        </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="{{ url_for('login') }}">Login <span class="sr-only"></span></a>
-        </li>
 
-      {% endif %}
-
-    </ul>
   </div>
 </nav>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--  <title>Bootstrap Case</title>-->
+<!--  <meta charset="utf-8">-->
+<!--  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">-->
+<!--&lt;!&ndash;  <meta name="viewport" content="width=device-width, initial-scale=1">&ndash;&gt;-->
+<!--   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>-->
+<!--  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+<!--  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+
+<!--</head>-->
+<!--<body>-->
+
+<!--<nav class="navbar navbar-inverse border-bottom w-100">-->
+
+<!--      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">-->
+<!--        <span class="icon-bar"></span>-->
+<!--        <span class="icon-bar"></span>-->
+<!--        <span class="icon-bar"></span>-->
+<!--      </button>-->
+<!--    <div class="container-fluid d-flex justify-content-between">-->
+
+<!--    <div class="collapse navbar-collapse" id="myNavbar">-->
+<!--      <ul class="nav navbar-nav">-->
+
+<!--        <li class="dropdown">-->
+<!--        <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for('about') }}">About</a>-->
+<!--          <a class="nav-link" href="{{ url_for('register') }}"><span class="glyphicon glyphicon-user"></span>Register</a>-->
+
+<!--          <ul class="dropdown-menu navbar-inverse navbar-right">-->
+<!--            <li><a class="liffs" href="{{ url_for('leaderboard') }}">Leaderboard</a></li>-->
+<!--            <li><a class="liffs" href="{{ url_for('overall_stats') }}">Overall stats</a></li>-->
+<!--          </ul>-->
+<!--        </li>-->
+<!--      </ul>-->
+<!--      <div class="test">-->
+<!--      <ul class="nav navbar-nav">-->
+<!--      {% if session.logged_in %}-->
+<!--        <li>-->
+<!--          <a href="{{ url_for('logout') }}"><span class="glyphicon glyphicon-log-out"></span>Logout</a>-->
+<!--        </li>-->
+<!--        <li>-->
+<!--          <a href="{{ url_for('dashboard') }}"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a>-->
+<!--        </li>-->
+<!--        <li>-->
+<!--          <a href="{{ url_for('stats', curr_user=session.username) }}"><span class="glyphicon glyphicon-stats"></span>My Stats</a>-->
+<!--        </li>-->
+<!--        {% else %}-->
+<!--        <li>-->
+<!--          <a class="nav-link" href="{{ url_for('register') }}"><span class="glyphicon glyphicon-user"></span>Register</a>-->
+<!--        </li>-->
+<!--        <li>-->
+<!--          <a class="nav-link" href="{{ url_for('login') }}"><span class="glyphicon glyphicon-log-in"></span>Login</a>-->
+<!--        </li>-->
+<!--        {% endif %}-->
+<!--      </ul>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</nav>-->
+
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<nav class="navbar navbar-expand-md navbar-dark bg-dark border-bottom">-->
+<!--  <a class="navbar-brand" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>-->
+<!--  <button class="navbar-toggler" type="button" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">-->
+<!--    <span class="navbar-toggler-icon"></span>-->
+<!--  </button>-->
+
+<!--  <div class="navbar-collapse" id="navbarsExampleDefault">-->
+<!--    <ul class="navbar-nav mr-auto">-->
+<!--      <li class="nav-item active">-->
+
+<!--      </li>-->
+<!--      <li class="nav-item">-->
+<!--        <a class="nav-link" href="{{ url_for('about') }}">About</a>-->
+<!--      </li>-->
+<!--      <li class="nav-item">-->
+<!--        <a class="nav-link" href="{{ url_for('leaderboard') }}">Leaderboard</a>-->
+<!--      </li>-->
+<!--       <li class="nav-item">-->
+<!--          <a class="nav-link" href="{{ url_for('overall_stats') }}">Overall stats <span class="sr-only"></span></a>-->
+<!--        </li>-->
+<!--    </ul>-->
+
+<!--    <ul class="navbar-nav navbar-right">-->
+<!--      {% if session.logged_in %}-->
+<!--        <li class="nav-item active">-->
+<!--          <a class="nav-link" href="{{ url_for('logout') }}">Logout <span class="sr-only"></span></a>-->
+<!--        </li>-->
+<!--        <li class="nav-item active">-->
+<!--          <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard <span class="sr-only"></span></a>-->
+<!--        </li>-->
+<!--      <li class="nav-item">-->
+<!--          <a class="nav-link" href="{{ url_for('stats', curr_user=session.username) }}">My Stats <span class="sr-only"></span></a>-->
+<!--      </li>-->
+<!--      {% else %}-->
+<!--        <li class="nav-item active">-->
+<!--          <a class="nav-link" href="{{ url_for('register') }}">Register <span class="sr-only"></span></a>-->
+<!--        </li>-->
+<!--        <li class="nav-item active">-->
+<!--          <a class="nav-link" href="{{ url_for('login') }}">Login <span class="sr-only"></span></a>-->
+<!--        </li>-->
+
+<!--      {% endif %}-->
+
+<!--    </ul>-->
+<!--  </div>-->
+<!--</nav>-->

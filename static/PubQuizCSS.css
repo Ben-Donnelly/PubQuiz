@@ -12,6 +12,7 @@ background-color: #D5D8DC;
 .leaderboardClass th {
   border: 1px solid #000;
   padding: 4px;
+  color: #000;
 }
 tr:nth-child(even) {background-color: #FFF;}
 
@@ -117,19 +118,31 @@ h1
 
 .wb, .wt
 {
+    color: #FFF!important;
+}
+
+.dropdown-menu
+{
+width: 10px !important;
+}
+.wt:active
+{
     color: #FFF;
 }
 
+.liffs
+{
+    color: #FFF!important;
+}
 .navbar-brand{
 border: none;
 }
 
-.labels{
-    color:white;
-    margin: 0px 0px 0px 0px;
-    position: relative;
-    top: -20px;
+.nav-link
+{
+    float:right;
 }
+
 .imgContainer{
     float: left;
     width: 50%;
@@ -137,3 +150,13 @@ border: none;
     margin-bottom: 0 auto;
     padding: 0.25%;
 }
+
+.currUserStatCont
+{
+  margin: auto;
+  width: 100%;
+  padding: 50px;
+  margin-left: 18%;
+  align: center;
+}
+
