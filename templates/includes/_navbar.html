@@ -34,9 +34,13 @@
         <div class="dropdown-menu wb ml-auto" aria-labelledby="navbarDropdown">
           <a class="liffs text-justify" href="{{ url_for('leaderboard') }}">Leaderboard <i class="fas fa-flag-checkered"></i></a>
           <div class="dropdown-divider"></div>
-          <a class="liffs" href="{{ url_for('overall_stats') }}">Overall stats <i class="fas fa-chart-bar"></i>
-          </a><div class="dropdown-divider"></div>
+          <a class="liffs" href="{{ url_for('overall_stats') }}">Overall stats <i class="fas fa-chart-bar"></i></a>
+          {% if session.logged_in %}
+          <div class="dropdown-divider"></div>
           <a class="liffs" href="{{ url_for('stats', curr_user=session.username) }}">My Stats <i class="fas fa-user-astronaut"></i></a>
+          <div class="dropdown-divider"></div>
+          <a class="liffs" href="{{ url_for('logout') }}">Logout <i class="fas fa-door-open"></i></a>
+          {% endif %}
         </div>
       </li>
     </ul>
