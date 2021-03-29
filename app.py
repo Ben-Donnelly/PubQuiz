@@ -339,7 +339,6 @@ def overall_avgs_chart(graph_usernames, score_result, custom_colours):
     # return render_template('curUserStats.html', plot_url=plot_url, curr_user=curr_user, score_stats=s_stats)
 
 @app.route(f"/overall/stats")
-@is_logged_in
 @cache.cached()
 def overall_stats():
     # Data for the overall stats page
