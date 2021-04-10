@@ -193,7 +193,7 @@ new Chart(document.getElementById("line-chart"), {
         data: line_graph_dict['score_dict']['Ben'],
         label: cust_labels[0],
         backgroundColor: cust_colours[0],
-        pointRadius: 2,
+        pointRadius: 4,
         borderColor: cust_colours[0],
         fill: false
       },
@@ -201,14 +201,14 @@ new Chart(document.getElementById("line-chart"), {
         data: line_graph_dict['score_dict']['Craig'],
         label: cust_labels[1],
         backgroundColor: cust_colours[1],
-        pointRadius: 2,
+        pointRadius: 4,
         borderColor: cust_colours[1],
         fill: false
       }, {
         data: line_graph_dict['score_dict']['Hazelf8'],
         label: cust_labels[2],
         backgroundColor: cust_colours[2],
-        pointRadius: 2,
+        pointRadius: 4,
         borderColor: cust_colours[2],
         fill: false
       }
