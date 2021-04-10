@@ -255,9 +255,16 @@ new Chart(document.getElementById("line-chart"), {
 new Chart(document.getElementById("pie-chart"), {
     type: 'pie',
     data: {
+      labels: cust_labels,
       datasets: [{
+        label: "Population (millions)",
         backgroundColor: cust_colours,
         data: cust_data
       }]
+    },
+    options: {
+      legend:{
+      display:false
+    }
     }
 });
