@@ -1,21 +1,47 @@
 {% extends "layout.html" %}
 
 {% block body %}
+<head>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js'></script>
+</head>
 <h1 class="wb">See how you stack up!</h1>
 <hr>
 
-    <div class="imgContainer">
-    <img src="data:image/png;base64, {{ pie_url }}" style="width:100%"/>
-</div>
-<div class="imgContainer">
-    <img src="data:image/png;base64, {{ bar_url }}" style="width:100%"/>
-</div>
-<br>
-<div class="imgContainer">
-     <img src="data:image/png;base64, {{ avg_scores_url }}" style="width:100%"/>
-</div>
-<div class="imgContainer">
-     <img src="data:image/png;base64, {{ line_url }}" style="width:100%"/>
+<div id="imgContainer" class="imgContainer">
+     <canvas id="bar-chart-h" style="width: 100%;" height="200%"></canvas>
 </div>
 
+<div class="imgContainer">
+    <canvas id="pie-chart" style="width: 100%;" height="200%"></canvas>
+</div>
+
+<br>
+
+<div class="imgContainer">
+     <canvas id="bar-chart" style="width: 100%;" height="200%"></canvas>
+</div>
+
+
+<div class="imgContainer">
+{#<!--     <img src="data:image/png;base64, {{ line_url }}" style="width:100%"/>-->#}
+
+		<canvas id="line-chart" style="width: 100%;" height="200%"></canvas>
+</div>
+<script>
+    var max = {{max}};
+
+    var cust_colours = {{ colours | safe }};
+    var cust_labels = {{ labels | safe }};
+    var cust_data = {{ values }};
+    var cust_colours_dict = {{ col_dict | safe }};
+
+    var line_graph_dict = {{ line_graph_dict | safe }};
+    var average_of_averages = {{ average_of_averages | safe }};
+
+    var b_avg_with_names = {{ b_avg_with_names | safe }};
+    var b_avg_scores = {{ b_avg_scores | safe }};
+    var b_avg_of_avg = {{ b_avg_of_avg | safe }};
+
+</script>
+<script src="{{ url_for('static', filename='PubQuizJS.js') }}"></script>
 {% endblock %}

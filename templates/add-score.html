@@ -1,15 +1,25 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-    <h1 style="color:white">Add Score</h1>
-    {% from "includes/_formhelpers.html" import render_field %}
-    <form method="POST" action="">
-        <div class="form-group wt">
-            {{ render_field(form.score, class_="form-control col-2") }}
+<h1 class="wt">Add Score</h1>
+{% from "includes/_formhelpers.html" import render_field %}
+
+<form method="POST" action="" class="form-dark col-lg-6 offset-lg-3">
+
+    <div class="row justify-content-center">
+        <div class="form-group wt ml2">
+            {{ render_field(form.score, class_="form-control") }}
         </div>
+    </div>
+
+    <div class="row justify-content-center">
         <div class="form-group wt">
-            {{ render_field(form.date, class_="form-control col-2", id="cal") }}
+             {{ render_field(form.date, class_="form-control", id="cal") }}
         </div>
-        <p><input class="btn" type="submit" value="Submit"></p>
-    </form>
+    </div>
+
+     <div class="row justify-content-center">
+         <p><input class="btn wt" type="submit" value="Submit"></p>
+     </div>
+</form>
 {% endblock %}

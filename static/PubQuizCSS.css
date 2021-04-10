@@ -4,6 +4,7 @@ table.leaderboardClass {
   text-align: center;
 
 }
+//html, body { height: 100%; width: 100%; margin: 0; }
 .leaderboardClass tr{
 background-color: #D5D8DC;
 }
@@ -35,6 +36,19 @@ tr:nth-child(even) {background-color: #FFF;}
 {
     background-color: #3e3e3e;
 }
+
+.ml2
+{
+    width: 189px;
+}
+
+#bar-chart{
+max-height: 420px;
+}
+
+/*canvas#bar-chart {
+  background-color: #fff;imgContainer
+}*/
 
 .PQRF
 {
@@ -83,6 +97,7 @@ h1
 {
     width:350px;
 }
+
 
 .bt
 {
@@ -146,10 +161,11 @@ border: none;
 .imgContainer{
     float: left;
     width: 50%;
-    height: auto;
+    height: 100%;
     margin-bottom: 0 auto;
     padding: 0.25%;
 }
+
 
 .currUserStatCont
 {

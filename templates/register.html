@@ -2,7 +2,7 @@
 
 {% block body %}
 <h1 class="wb">Register</h1>
-{% from "includes/_formhelpers.html" import render_field%}
+{% from "includes/_formhelpers.html" import render_field %}
 
 <form method="POST" action="" id="regForm" class="form-dark col-lg-6 offset-lg-3">
     <div class="row justify-content-center">
@@ -10,6 +10,7 @@
             {{ render_field(form.name, class_="form-control regfr") }}
         </div>
     </div>
+
     <div class="row justify-content-center">
         <div class="form-group wt">
             {{ render_field(form.email, class_="form-control regfr") }}
