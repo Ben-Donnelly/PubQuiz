@@ -42,6 +42,21 @@ tr:nth-child(even) {background-color: #FFF;}
     width: 189px;
 }
 
+#colorpicker
+{
+    background: #000;
+    border: none;
+    padding : 0px;
+    margin-left: 5%;
+    margin-right: 50%;
+}
+
+#cp-text
+{
+margin-left: 5%;
+}
+
+
 #bar-chart{
 max-height: 420px;
 }
@@ -176,3 +191,14 @@ border: none;
   align: center;
 }
 
+.edit_msg
+{
+    margin: 30px auto;
+    padding: 10px;
+    border-radius: 5px;
+    color: #FFFFFF;
+    background: #008000;
+    border: 1px;
+    width: 100%;
+    text-align: center;
+}

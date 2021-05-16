@@ -2,7 +2,8 @@
 
 {% block body %}
 <head>
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js'></script>
+    <script src="{{ url_for('static', filename='PubQuizJS.js') }}"></script>
 </head>
 <h1 class="wb">See how you stack up!</h1>
 <hr>
@@ -23,8 +24,6 @@
 
 
 <div class="imgContainer">
-{#<!--     <img src="data:image/png;base64, {{ line_url }}" style="width:100%"/>-->#}
-
 		<canvas id="line-chart" style="width: 100%;" height="200%"></canvas>
 </div>
 <script>
@@ -32,6 +31,11 @@
 
     var cust_colours = {{ colours | safe }};
     var cust_labels = {{ labels | safe }};
+    /*
+<!--    var score_stats = {{ score_stats | safe }};-->
+
+<!--    console.log(score_stats);-->
+*/
     var cust_data = {{ values }};
     var cust_colours_dict = {{ col_dict | safe }};
 
@@ -42,6 +46,10 @@
     var b_avg_scores = {{ b_avg_scores | safe }};
     var b_avg_of_avg = {{ b_avg_of_avg | safe }};
 
+    drawHorizontalChart();
+    drawAvergaesChart();
+    drawLineChart();
+    drawPieChart();
+
 </script>
-<script src="{{ url_for('static', filename='PubQuizJS.js') }}"></script>
 {% endblock %}

@@ -2,9 +2,56 @@
 
 
 {% block body %}
+
+<div id ="editmessage" style="display:none;" class ="edit_msg">Colour changed successfully</div>
 <h1 style="color:white">Welcome {{session.username}}</h1>
-<a class="btn wb" href="{{url_for('add_score')}}">Add Score</a>
-<a class="btn wb" href="{{ url_for('overall_stats')}}">Stats</a>
-<hr>
+<div class="row justify-content-center">
+    <div class="form-group wt ml2">
+        <a class="btn wb" href="{{url_for('add_score')}}">Add Score</a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="form-group wt ml2">
+        <a class="btn wb" href="{{ url_for('overall_stats')}}">Stats</a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+
+    <div class="form-group wt ml2">
+        <p id="cp-text"> Customise graph colours:</p>
+    <input type="color" id="colorpicker" value="#0000ff">
+{# <!--        <button type="button" class="btn wb" action="{{ url_for( 'change_graph_colour') }}">Select</button>--> #}
+<!--        <a class="btn wb">Select</a>-->
+    <button class="btn wb" id="colour-selector">Select</button>
+    </div>
+</div>
+
+
+<script>
+
+let myVar = '0000ff'
+
+$( "#colour-selector" ).click(function() {
+
+    myVar = $("#colorpicker").val().slice(1,);
+    $.ajaxSetup({
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    });
+
+
+    $.post(`/${myVar}/`, function(){
+})
+
+ $(".edit_msg").fadeTo(2000, 500).slideUp(500, function(){
+       $(".edit_msg").slideUp(600);
+     });
+});
+
+</script>
 
 {% endblock %}

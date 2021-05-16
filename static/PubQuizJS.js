@@ -35,70 +35,74 @@ Chart.pluginService.register({
 });
 
 var steps = 20;
+function drawHorizontalChart()
+{
 
-// Horizontal Bar Chart
-new Chart(document.getElementById("bar-chart-h"), {
-    type: 'horizontalBar',
-    data: {
-      labels: cust_labels,
-      datasets: [
-        {
-          backgroundColor: cust_colours,
-          data: cust_data
-        }
-      ]
-    },
-    options: {
-    indexAxis: 'y',
-      legend: { display: false },
-      title: {
-        display: true,
-        text: ''
-      },
-      scales: {
-        yAxes: [{
-            ticks: {
-                beginAtZero: true
+
+    new Chart(document.getElementById("bar-chart-h"), {
+        type: 'horizontalBar',
+        data: {
+          labels: cust_labels,
+          datasets: [
+            {
+              backgroundColor: cust_colours,
+              data: cust_data
             }
-        }]
-    },
-
-    animation: {
-            duration: 2000,
-            easing: 'easeOutBounce',
+          ]
+        },
+        options: {
+        indexAxis: 'y',
+          legend: { display: false },
+          title: {
+            display: true,
+            text: ''
+          },
+          scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
         },
 
-      annotation: {
-      annotations: [{
-        type: 'line',
-        mode: 'horizontal',
-        scaleID: 'y-axis-0',
-        value: 100,
-        borderColor: 'rgb(255, 255, 255)',
-        borderWidth: 10,
-        label: {
-          enabled: true,
-          content: 'Test label'
+        animation: {
+                duration: 2000,
+                easing: 'easeOutBounce',
+            },
+
+          annotation: {
+          annotations: [{
+            type: 'line',
+            mode: 'horizontal',
+            scaleID: 'y-axis-0',
+            value: 100,
+            borderColor: 'rgb(255, 255, 255)',
+            borderWidth: 10,
+            label: {
+              enabled: true,
+              content: 'Test label'
+            }
+                  }]
+        },
+
+          responsive: true,
+          maintainAspectRatio: true,
+          scaleOverride: true,
+          scaleSteps: steps,
+          scaleStepWidth: Math.ceil(max / steps),
+          scaleStartValue: 0,
+          scaleShowVerticalLines: true,
+          scaleShowGridLines : true,
+          barShowStroke : true,
+          scaleShowLabels: true
         }
-              }]
-    },
+    });
 
-      responsive: true,
-      maintainAspectRatio: true,
-      scaleOverride: true,
-      scaleSteps: steps,
-      scaleStepWidth: Math.ceil(max / steps),
-      scaleStartValue: 0,
-      scaleShowVerticalLines: true,
-      scaleShowGridLines : true,
-      barShowStroke : true,
-      scaleShowLabels: true
-    }
-});
+};
 
+function drawAvergaesChart()
+{
 
-// Averages Bar Chart
-// Horizontal Bar Chart
 new Chart(document.getElementById("bar-chart"), {
     type: 'bar',
     data: {
@@ -158,113 +162,248 @@ new Chart(document.getElementById("bar-chart"), {
     }
 });
 
-//function line_graph(index, data)
-//{
-////var i = 0;
-//
-//    payload = {
-//        data: line_graph_dict['score_dict'][cust_labels[index]],
-//        label = cust_labels[i],
-//        backgroundColor = cust_colours[[cust_labels[index]],
-//        pointRadius = 2,
-//        borderColor = cust_colours[[cust_labels[index]]],
-//        fill = false
-//    }
-//    return payload;
-//}
-console.log(average_of_averages);
-new Chart(document.getElementById("line-chart"), {
-  type: 'line',
-  data: {
-    labels: line_graph_dict['x_axis'],
-    datasets: [
-//    for(var i = 0; i < cust_labels.length; i++)
-//    {
-//        data: line_graph_dict['score_dict'][cust_labels[i]],
-//        label: [cust_labels[i],
-//        backgroundColor: cust_colours[[cust_labels[i]],
-//        pointRadius: 2,
-//        borderColor: cust_colours[[cust_labels[i]],
-//        fill: false
-//      },
-//    }
-//    }
+};
+
+
+function drawLineChart()
 {
-        data: line_graph_dict['score_dict']['Ben'],
-        label: cust_labels[0],
-        backgroundColor: cust_colours[0],
-        pointRadius: 4,
-        borderColor: cust_colours[0],
-        fill: false
-      },
-        {
-        data: line_graph_dict['score_dict']['Craig'],
-        label: cust_labels[1],
-        backgroundColor: cust_colours[1],
-        pointRadius: 4,
-        borderColor: cust_colours[1],
-        fill: false
-      }, {
-        data: line_graph_dict['score_dict']['Hazelf8'],
-        label: cust_labels[2],
-        backgroundColor: cust_colours[2],
-        pointRadius: 4,
-        borderColor: cust_colours[2],
-        fill: false
-      }
-    ]
-  },
-  options: {
-   legend: {
-    display: false,
-  },
+    console.log(average_of_averages);
+    new Chart(document.getElementById("line-chart"), {
+      type: 'line',
+      data: {
+        labels: line_graph_dict['x_axis'],
+        datasets: [
 
-  scales: {
-        yAxes: [{
-            ticks: {
-                beginAtZero: true
-            }
-        }],
-
-        xAxes: [{
-            scaleLabel:
+    {
+            data: line_graph_dict['score_dict']['Ben'],
+            label: cust_labels[0],
+            backgroundColor: cust_colours[0],
+            pointRadius: 4,
+            borderColor: cust_colours[0],
+            fill: false
+          },
             {
-                display: true,
-                labelString: 'Week No.'
-            }
-        }]
-    },
-      tooltips: {
-    callbacks: {
-       title: function(tooltipItem, data) {
-        return 'Week: ' + this._data.labels[tooltipItem[0].index];
-    }
-    }
-  },
-    title: {
-      display: false,
-      text: ''
-    },
+            data: line_graph_dict['score_dict']['Craig'],
+            label: cust_labels[1],
+            backgroundColor: cust_colours[1],
+            pointRadius: 4,
+            borderColor: cust_colours[1],
+            fill: false
+          }, {
+            data: line_graph_dict['score_dict']['Hazelf8'],
+            label: cust_labels[2],
+            backgroundColor: cust_colours[2],
+            pointRadius: 4,
+            borderColor: cust_colours[2],
+            fill: false
+          }
+        ]
+      },
+      options: {
+       legend: {
+        display: false,
+      },
 
-    responsive: true,
-    maintainAspectRatio: true
-  }
+      scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }],
 
-});
+            xAxes: [{
+                scaleLabel:
+                {
+                    display: true,
+                    labelString: 'Week No.'
+                }
+            }]
+        },
+          tooltips: {
+        callbacks: {
+           title: function(tooltipItem, data) {
+            return 'Week: ' + this._data.labels[tooltipItem[0].index];
+        }
+        }
+      },
+        title: {
+          display: false,
+          text: ''
+        },
 
-new Chart(document.getElementById("pie-chart"), {
-    type: 'pie',
-    data: {
-      labels: cust_labels,
-      datasets: [{
-        label: "Population (millions)",
-        backgroundColor: cust_colours,
-        data: cust_data
-      }]
-    },
-    options: {
-      legend:{
-      display:false
-    }
-    }
-});
+        responsive: true,
+        maintainAspectRatio: true
+      }
+
+    });
+}
+
+function drawPieChart()
+{
+    new Chart(document.getElementById("pie-chart"), {
+        type: 'pie',
+        data: {
+          labels: cust_labels,
+          datasets: [{
+            label: "",
+            backgroundColor: cust_colours,
+            data: cust_data
+          }]
+        },
+        options: {
+          legend:{
+          display:false
+        }
+        }
+    });
+}
+
+function drawUserLineChart(curr_user, score_stats)
+{
+
+new Chart(document.getElementById("line-chart-user"), {
+      type: 'line',
+      data: {
+        labels: num_of_weeks,
+        datasets: [
+
+    {
+            data: scores_l,
+            label: cust_labels,
+            backgroundColor: colour,
+            pointRadius: 6,
+            borderColor: colour,
+            fill: false
+          },
+
+        ]
+      },
+      options: {
+       legend: {
+        display: false,
+      },
+
+      scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }],
+
+            xAxes: [{
+                scaleLabel:
+                {
+                    display: true,
+                    labelString: 'Week No.'
+                }
+            }]
+        },
+          tooltips: {
+        callbacks: {
+           title: function(tooltipItem, data) {
+            return 'Week: ' + this._data.labels[tooltipItem[0].index];
+        }
+        }
+      },
+        title: {
+          display: false,
+          text: ''
+        },
+
+        responsive: true,
+        maintainAspectRatio: true
+      }
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//console.log(scores_l);
+//    new Chart(document.getElementById("line-chart-user"), {
+//      type: 'line',
+//      data: {
+////        labels: cust_labels,
+//        datasets: [
+//
+//    {
+//            data: scores_l,
+//            label: cust_labels,
+//            backgroundColor: colour,
+//            pointRadius: 4,
+//            borderColor: colour,
+//            fill: false
+//          }
+//        ]
+//      },
+//      options: {
+//       legend: {
+//        display: false,
+//      },
+//
+//      scales: {
+//            yAxes: [{
+//                ticks: {
+//                    beginAtZero: true
+//                }
+//            }],
+//
+//            xAxes: [{
+//                scaleLabel:
+//                {
+//                    display: true,
+//                    labelString: 'Week No.'
+//                }
+//            }]
+//        },
+//          tooltips: {
+//        callbacks: {
+//           title: function(tooltipItem, data) {
+//            return 'Week: ' + this._data.labels[tooltipItem[0].index];
+//        }
+//        }
+//      },
+//        title: {
+//          display: false,
+//          text: ''
+//        },
+//
+//        responsive: true,
+//        maintainAspectRatio: true
+//      }
+//
+//    });
+}

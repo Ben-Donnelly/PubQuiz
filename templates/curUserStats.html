@@ -3,15 +3,32 @@
 
 {% block body %}
 
+<head>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js'></script>
+    <script src="{{ url_for('static', filename='PubQuizJS.js') }}"></script>
+</head>
+
 <h1 class="text-secondary">Stats for {{ curr_user }}</h1>
 <hr>
-<div class="currUserStatCont wb">
-    <img src="data:image/png;base64, {{ plot_url }}" style="width:70%">
+<!--<div class="currUserStatCont wb">-->
+<!--    <div class="imgContainer">-->
+		<canvas id="line-chart-user" width="900" height="400"></canvas>
+<!--</div>-->
+<!--    <img src="data:image/png;base64, {{ plot_url }}" style="width:70%">-->
     <div>
         <p>Your average score is: {{ score_stats[0] }}</p>
         <p>Your best score is: {{ score_stats[1] }}</p>
         <p>Your worst score is: {{ score_stats[2] }}</p>
     </div>
+<!--</div>-->
+<script>
+    var colour = "{{ colour | safe}}";
+    var score_stats = {{score_stats}};
+    var scores_l = {{ scores_l }};
+    var line_graph_dict = {'score_dict': {'Ben': [16, 16, 17, 20, 18, 18, 18, 17, 20, 21, 17, 18, 20, 19, 20, 19, 19, 21, 17], 'Craig': [22, 19, 20, 23, 21, 17, 22, 20, 21, 21, 19, 20, 14, 20, 15, 22, 22, 18, 17], 'Hazelf8': [20, 25, 20, 19, 12, 20, 17, 17, 21, 18, 18, 17, 20, 22, 17, 18, 21, 21, 14]}, 'x_axis': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19']};
+    var num_of_weeks = Array.from({length:scores_l.length},(v,k)=>k+1)
+    var cust_labels = '{{ curr_user | safe }}';
+    drawUserLineChart(cust_labels, score_stats);
 
-</div>
+</script>
 {% endblock %}
