@@ -8,16 +8,14 @@ from functools import wraps
 from io import BytesIO
 import matplotlib.pyplot as plt
 from base64 import b64encode
-from flask_caching import Cache
+from flask_cors import CORS
 import matplotlib
 from statistics import mean
-import numpy as np
 matplotlib.use('Agg')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '>\xcdN\x9f\xcc\x0f<\xec\xb0x\x8em~\xc6\x16\xae~?&\xc2\x81\xa9\xa1&'
-
-# cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+CORS(app)
 
 firebase = firebase.FirebaseApplication("https://pubquiztracker.firebaseio.com/", None)
 
@@ -37,7 +35,6 @@ def get_required_data(parent_dir="Scores", user_name="", endpoint=""):
 
 
 @app.route("/leaderboard")
-# @cache.cached()
 def leaderboard():
 	score_result = get_required_data()
 
@@ -77,8 +74,8 @@ class RegisterForm(Form):
 @app.route("/register", methods=["GET", "POST"])
 def register():
 	flash("This application was made for a small number of people and so no new users are able to register at this "
-		  "point. Please contact the site owner if you have any questions. This page is left in for "
-		  "demonstration purposes only", 'warning')
+		  			"point. Please contact the site owner if you have any questions. This page is left in for "
+		  			"demonstration purposes only", 'warning')
 	form = RegisterForm(request.form)
 
 	return render_template('register.html', form=form)
@@ -180,8 +177,6 @@ def update_user_average(scores_l):
 @is_logged_in
 def add_score():
 	form = ScoreForm(request.form)
-	# Clear cache so that the leaderboard will be updated
-	# cache.clear()
 
 	if request.method == "POST" and form.validate():
 
@@ -219,18 +214,13 @@ def all_average():
 
 
 @app.route(f"/<string:curr_user>_stats")
-# @cache.cached()
 @is_logged_in
 def stats(curr_user):
-	fig, ax = plt.subplots()
-
 	score_result = get_required_data(user_name=curr_user)
 
-	scores_l = score_result['Scores']
+	custom_colours_dict = get_required_data(parent_dir="Colours")
 
-	img = BytesIO()
-	len_scores = score_result['num_entries']
-	x = [f"{i + 1}" for i in range(len_scores)]
+	scores_l = score_result['Scores']
 
 	average = round(mean(scores_l), 2)
 
@@ -244,17 +234,8 @@ def stats(curr_user):
 
 	s_stats = [average, best, worst]
 
-	plt.plot(x, scores_l, '--ko', label="Your scores")
-	plt.hlines(y=average, xmin=0, xmax=len(scores_l)-1, label="Average")
-	ax.set_xlabel('Week No.')
-
-	plt.legend()
-	plt.savefig(img, format='png')
-	plt.close()
-	img.seek(0)
-	plot_url = b64encode(img.getvalue()).decode('utf8')
-
-	return render_template('curUserStats.html', plot_url=plot_url, curr_user=curr_user, score_stats=s_stats)
+	return render_template('curUserStats.html', scores_l=scores_l, colour=custom_colours_dict[curr_user],
+						   curr_user=curr_user, score_stats=s_stats)
 
 
 def pie_chart(graph_usernames, custom_colours, graph_scores):
@@ -299,7 +280,8 @@ def barv_chart(graph_usernames, score_result):
 
 	return [labels, all_avg_lis, avg_of_avg]
 
-def overall_avgs_chart(graph_usernames, score_result, custom_colours):
+
+def overall_avgs_chart(graph_usernames, score_result):
 	x = 0
 	dict_of_each_players_scores = {}
 
@@ -314,13 +296,13 @@ def overall_avgs_chart(graph_usernames, score_result, custom_colours):
 
 
 @app.route(f"/overall/stats")
-# @cache.cached()
 def overall_stats():
 	# Data for the overall stats page
 	score_result = get_required_data()
 	usernames = list(score_result.keys())
-	cust_colours = ["#2631C3", "#AF33FF", "#F5B31E"]
-	custom_colours_dict = {"Ben": "#2631C3", "Craig": "#AF33FF", "Hazel": "#F5B31E2"}
+
+	custom_colours_dict = get_required_data(parent_dir="Colours")
+	cust_colours = list(custom_colours_dict[i] for i in custom_colours_dict)
 
 	average_of_averages = round(mean([score_result[usernames[i]]['Average'] for i in range(len(usernames))]), 2)
 
@@ -330,16 +312,23 @@ def overall_stats():
 	# 0: Individual Average Scores with Names, 1: Just The Scores, 3: Average of Averages
 	avg_with_names, avg_scores, avg_of_avg = barv_chart(usernames, score_result)
 
-	line_img = overall_avgs_chart(usernames, score_result, iter(cust_colours))
+	line_img = overall_avgs_chart(usernames, score_result)
 
-	line_graph_dict = {"score_dict": line_img[0], "x_axis" : line_img[1]}
-# pie_url=pie_img, bar_url=barh_img,
-# 	for i in range(len(usernames)):
-# 		usernames[i] += f" ({score_result[usernames[i]]['Average']})"
+	line_graph_dict = {"score_dict": line_img[0], "x_axis": line_img[1]}
+
 	return render_template('overallStats.html', b_avg_with_names=avg_with_names, b_avg_scores=avg_scores,
-						   b_avg_of_avg=avg_of_avg, average_of_averages = average_of_averages, max=max(graph_scores),
+						   b_avg_of_avg=avg_of_avg, average_of_averages=average_of_averages, max=max(graph_scores),
 						   labels=usernames, values=graph_scores, line_graph_dict=line_graph_dict, colours=cust_colours,
-						   col_dict = custom_colours_dict)
+						   col_dict=custom_colours_dict)
+
+
+@app.route('/<string:variable>/', methods=['POST'])
+def get_js(variable):
+	js_variable = variable
+	firebase.put(f"/pubquiztracker/Colours", session['username'], f"#{js_variable}")
+	flash("Score entered!", "success")
+	return redirect(url_for("register"))
+
 
 if __name__ == "__main__":
 	app.run(debug=True)
