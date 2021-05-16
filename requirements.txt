@@ -13,3 +13,4 @@ sseclient==0.0.27
 pycrypto==2.6.1
 requests-toolbelt==0.9.1
 numpy==1.19.5
+Flask-Cors==3.0.10
