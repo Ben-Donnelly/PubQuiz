@@ -164,9 +164,6 @@ class ScoreForm(Form):
 	score = IntegerField("Score", [validators.data_required(message="You need to enter your score as a number")])
 	date = DateField("Date")
 
-class EditScoreForm(Form):
-	score = IntegerField("Updated Score", [validators.data_required(message="You need to enter your score as a number")])
-
 def update_user_average(scores_l):
 	# Gets number of quizzes completed and computes the new average
 
