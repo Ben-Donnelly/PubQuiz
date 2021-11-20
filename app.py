@@ -74,8 +74,8 @@ class RegisterForm(Form):
 @app.route("/register", methods=["GET", "POST"])
 def register():
 	flash("This application was made for a small number of people and so no new users are able to register at this "
-		  			"point. Please contact the site owner if you have any questions. This page is left in for "
-		  			"demonstration purposes only", 'warning')
+		  "point. Please contact the site owner if you have any questions. This page is left in for "
+		  "demonstration purposes only", 'warning')
 	form = RegisterForm(request.form)
 
 	return render_template('register.html', form=form)
@@ -141,8 +141,10 @@ def logout():
 
 @app.route("/dashboard")
 @is_logged_in
-def dashboard():
-	return render_template("dashboard.html", curr_user=session['username'])
+def dashboard(message=None):
+	if message:
+		flash(message, 'success')
+	return render_template("dashboard.html")
 
 
 def get_scores_for_update(new_score, u_name):
@@ -161,7 +163,6 @@ def get_scores_for_update(new_score, u_name):
 class ScoreForm(Form):
 	score = IntegerField("Score", [validators.data_required(message="You need to enter your score as a number")])
 	date = DateField("Date")
-
 
 def update_user_average(scores_l):
 	# Gets number of quizzes completed and computes the new average
@@ -329,6 +330,28 @@ def get_js(variable):
 	flash("Score entered!", "success")
 	return redirect(url_for("register"))
 
+@app.route("/alter/score", methods=["GET", "POST"])
+def alter_scores():
+	if request.method == "POST":
+		return delete_score()
+
+	if request.method == "GET":
+		curr_user = session['username']
+		score_result = get_required_data(user_name=curr_user)
+
+		score_to_delete = score_result['Scores'][-1]
+
+		return render_template("alterScore.html", num_rows=1, curr_user=curr_user, score_to_delete=score_to_delete)
+
+def delete_score():
+	result = firebase.get(f"/pubquiztracker/Scores/{session['username']}", "")
+	# Remove last score
+	result['Scores'] = result['Scores'][:-1]
+	# Reduce num of entries
+	result['num_entries'] = result['num_entries']-1
+
+	firebase.put(f"/pubquiztracker/Scores", session['username'], result)
+	return dashboard("Score deleted!")
 
 if __name__ == "__main__":
 	app.run(debug=True)

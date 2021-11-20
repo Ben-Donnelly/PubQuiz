@@ -21,10 +21,16 @@
 
     <div class="form-group wt ml2">
         <p id="cp-text"> Customise graph colours:</p>
-    <input type="color" id="colorpicker" value="#0000ff">
-{# <!--        <button type="button" class="btn wb" action="{{ url_for( 'change_graph_colour') }}">Select</button>--> #}
-<!--        <a class="btn wb">Select</a>-->
-    <button class="btn wb" id="colour-selector">Select</button>
+        <input type="color" id="colorpicker" value="#0000ff">
+        <button class="btn wb" id="colour-selector">Select</button>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="form-group wt ml2">
+        <a class="btn wb" href="{{url_for('alter_scores')}}">Craig button</a><i id="icon" class="far fa-question-circle"></i>
+        <p id="info" style="display: none">This will let you delete the last score you entered. Craig always needs this,
+            hence the Craig button</p>
     </div>
 </div>
 
@@ -52,6 +58,13 @@ $( "#colour-selector" ).click(function() {
      });
 });
 
+var e = document.getElementById('icon');
+e.onmouseover = function() {
+  document.getElementById('info').style.display = 'block';
+}
+e.onmouseout = function() {
+  document.getElementById('info').style.display = 'none';
+}
 </script>
 
 {% endblock %}
