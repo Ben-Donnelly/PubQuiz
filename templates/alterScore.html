@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<h1 style="color:white">Leaderboard</h1>
+<hr>
+<form method="POST" onSubmit="return confirm('Are you sure you want to to delete your last score?');" class="form-dark col-lg-6 offset-lg-3">
+  <table class="leaderboardClass" id="PQTable">
+    <tbody>
+    <tr>
+      <th colspan="2">{{ curr_user }}</th>
+      <th>Delete</th>
+    </tr>
+
+    <tr>
+      <td>1 week ago</td>
+      <td>{{ score_to_delete }}</td>
+        <td><input class="btn wb" type="submit" value="Submit"></td>
+    </tbody>
+  </table>
+</form>
+<br>
+{% endblock %}
+
