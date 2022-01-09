@@ -80,7 +80,7 @@ def register():
 #  Login
 def check_user():
 	user_email = request.form['email']
-	user_db_call_result = get_required_data(parent_dir="Users", year=current_year)
+	user_db_call_result = get_required_data(parent_dir="Users")
 	# Todo: make this better
 	for user, user_data in user_db_call_result.items():
 		candidate_user = user_data["Email"]
