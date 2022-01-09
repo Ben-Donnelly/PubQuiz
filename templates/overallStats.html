@@ -31,12 +31,9 @@
 
     var cust_colours = {{ colours | safe }};
     var cust_labels = {{ labels | safe }};
-    /*
-<!--    var score_stats = {{ score_stats | safe }};-->
 
-<!--    console.log(score_stats);-->
-*/
     var cust_data = {{ values }};
+    var min_x_axis_start = Math.round(...cust_data)-(Math.round(...cust_data) % 5);
     var cust_colours_dict = {{ col_dict | safe }};
 
     var line_graph_dict = {{ line_graph_dict | safe }};
@@ -47,7 +44,7 @@
     var b_avg_of_avg = {{ b_avg_of_avg | safe }};
 
     drawHorizontalChart();
-    drawAvergaesChart();
+    drawAveragesChart();
     drawLineChart();
     drawPieChart();
 

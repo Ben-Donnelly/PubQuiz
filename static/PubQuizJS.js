@@ -62,7 +62,15 @@ function drawHorizontalChart()
                 ticks: {
                     beginAtZero: true
                 }
-            }]
+            }],
+            xAxes: [
+                    {
+                      ticks:
+                      {
+                        beginAtZero: false,
+                        min: min_x_axis_start
+                      }
+                    }],
         },
 
         animation: {
@@ -100,7 +108,7 @@ function drawHorizontalChart()
 
 };
 
-function drawAvergaesChart()
+function drawAveragesChart()
 {
 
 new Chart(document.getElementById("bar-chart"), {
@@ -266,11 +274,18 @@ new Chart(document.getElementById("line-chart-user"), {
       data: {
         labels: num_of_weeks,
         datasets: [
-
-    {
-            data: scores_l,
-            label: cust_labels,
+          {
+            data: scores_list,
+            label: "2022",
             backgroundColor: colour,
+            pointRadius: 6,
+            borderColor: colour,
+            fill: false
+          },
+          {
+            data: last_year_scores_to_use,
+            label: "2021",
+            backgroundColor: "#FFF",
             pointRadius: 6,
             borderColor: colour,
             fill: false
@@ -352,7 +367,7 @@ new Chart(document.getElementById("line-chart-user"), {
 
 
 
-//console.log(scores_l);
+//console.log(scores_list);
 //    new Chart(document.getElementById("line-chart-user"), {
 //      type: 'line',
 //      data: {
@@ -360,7 +375,7 @@ new Chart(document.getElementById("line-chart-user"), {
 //        datasets: [
 //
 //    {
-//            data: scores_l,
+//            data: scores_list,
 //            label: cust_labels,
 //            backgroundColor: colour,
 //            pointRadius: 4,

@@ -2,22 +2,19 @@ from flask import Flask, render_template, flash, redirect, url_for, session, req
 from firebase import firebase
 from datetime import date as sys_date
 from wtforms import Form, IntegerField, PasswordField, StringField, validators
-from wtforms.fields.html5 import EmailField, DateField
+from wtforms.fields import EmailField, DateField
 from passlib.hash import sha256_crypt
 from functools import wraps
-from io import BytesIO
-import matplotlib.pyplot as plt
-from base64 import b64encode
 from flask_cors import CORS
-import matplotlib
 from statistics import mean
-matplotlib.use('Agg')
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '>\xcdN\x9f\xcc\x0f<\xec\xb0x\x8em~\xc6\x16\xae~?&\xc2\x81\xa9\xa1&'
 CORS(app)
 
 firebase = firebase.FirebaseApplication("https://pubquiztracker.firebaseio.com/", None)
+current_year = str(datetime.today().year)
 
 
 @app.route('/')
@@ -30,33 +27,32 @@ def about():
 	return render_template('about.html')
 
 
-def get_required_data(parent_dir="Scores", user_name="", endpoint=""):
-	return firebase.get(f"/pubquiztracker/{parent_dir}/{user_name}", endpoint)
+def get_required_data(parent_dir="Scores", user_name="", endpoint="", year=""):
+	return firebase.get(f"/pubquiztracker/{year}/{parent_dir}/{user_name}", endpoint)
 
 
 @app.route("/leaderboard")
 def leaderboard():
-	score_result = get_required_data()
+	score_result = get_required_data(year=current_year)
 
-	scores_l = []
-	m_rows = 0
+	scores_list = []
+	min_number_needed_rows = 0
 
 	for k, v in score_result.items():
 		# Makes list of lists of each users scores
 		individual_user_scores = score_result[k]
-		scores_l.append(individual_user_scores['Scores'])
+		scores_list.append(individual_user_scores['Scores'])
 
-		# If 1 person has done 10 quizzes but another only 1 | 2 | 3 | ... | 9
-		# We still need 10 rows
-		m_rows = max(m_rows, v['num_entries'])
+		# If 1 person has done 10 quizzes but another only 9 we still need 10 rows
+		min_number_needed_rows = max(min_number_needed_rows, v['num_entries'])
 
 	# Use of dictionary for better integrity
 	user_d = {k: v for k, v in enumerate(list(score_result.keys()))}
 
 	# For total scores row
-	t_scores = [sum(i) for i in scores_l]
+	t_scores = [sum(i) for i in scores_list]
 
-	return render_template("leaderboard.html", num_users=user_d, num_rows=m_rows, scores=scores_l, tot_scores=t_scores)
+	return render_template("leaderboards/leaderboard_2022.html", current_year=current_year, num_users=user_d, num_rows=min_number_needed_rows, scores=scores_list, tot_scores=t_scores)
 
 
 class RegisterForm(Form):
@@ -83,24 +79,25 @@ def register():
 
 #  Login
 def check_user():
-	email = request.form['email']
-	result = get_required_data(parent_dir="Users")
-	for k, v in result.items():
-		pot_user = v["Email"]
-		if pot_user == email:
-			return v['Username'], v['Password']
+	user_email = request.form['email']
+	user_db_call_result = get_required_data(parent_dir="Users", year=current_year)
+	# Todo: make this better
+	for user, user_data in user_db_call_result.items():
+		candidate_user = user_data["Email"]
+		if candidate_user == user_email:
+			return user_data['Username'], user_data['Password']
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
 	if request.method == "POST":
 		password_candidate = request.form['password']
-		creds = check_user()
-		if creds:
-			username = creds[0]
-			check_pass = creds[1]
+		credentials = check_user()
+		if credentials:
+			username = credentials[0]
+			password_to_check = credentials[1]
 
-			if sha256_crypt.verify(password_candidate, check_pass):
+			if sha256_crypt.verify(password_candidate, password_to_check):
 				#  Passed
 				session['logged_in'] = True
 				session['username'] = username
@@ -108,7 +105,7 @@ def login():
 				flash("You are now logged in!", 'success')
 				return redirect(url_for('dashboard'))
 			else:
-				error_msg = "Invalid login"
+				error_msg = "Invalid login, please check your username and password"
 				return render_template("login.html", error=error_msg)
 
 		else:
@@ -150,28 +147,28 @@ def dashboard(message=None):
 def get_scores_for_update(new_score, u_name):
 	try:
 		# Gets all scores list for current user
-		u_list = get_required_data(user_name=u_name)['Scores']
+		user_list = get_required_data(year=current_year, user_name=u_name)['Scores']
 		# Adds new score
-		u_list.append(new_score)
+		user_list.append(new_score)
 	except TypeError:
 		flash("Something went wrong, tell Ben and give him the values you put in for score and date!", "danger")
 		return redirect(url_for("add_score"))
 
-	return u_list
+	return user_list
 
 
 class ScoreForm(Form):
 	score = IntegerField("Score", [validators.data_required(message="You need to enter your score as a number")])
 	date = DateField("Date")
 
-def update_user_average(scores_l):
+def update_user_average(scores_list):
 	# Gets number of quizzes completed and computes the new average
 
 	# The new score has already been added, saves call to db
-	curr_num_of_scores = len(scores_l)
-	new_average = round(mean(scores_l), 2)
+	current_num_of_scores = len(scores_list)
+	new_average = round(mean(scores_list), 2)
 
-	return [new_average, curr_num_of_scores]
+	return [new_average, current_num_of_scores]
 
 
 @app.route("/add/score", methods=['GET', 'POST'])
@@ -201,7 +198,7 @@ def add_score():
 		}
 
 		# Update the scores
-		firebase.put("/pubquiztracker/Scores", session["username"], data)
+		firebase.put(f"/pubquiztracker/{current_year}/Scores", session["username"], data)
 		flash("Score entered!", "success")
 
 		return redirect(url_for("dashboard"))
@@ -209,66 +206,36 @@ def add_score():
 
 
 def all_average():
-	score_result = get_required_data()
+	score_result = get_required_data(year=current_year)
 	average_lis = [v['Average'] for v in score_result.values()]
 	return average_lis
 
 
-@app.route(f"/<string:curr_user>_stats")
+@app.route(f"/<string:curr_user>/statistics")
 @is_logged_in
 def stats(curr_user):
-	score_result = get_required_data(user_name=curr_user)
+	score_result = get_required_data(year=current_year, user_name=curr_user)
+	last_year_results = get_required_data(year=str(int(current_year)-1), user_name=curr_user)
 
 	custom_colours_dict = get_required_data(parent_dir="Colours")
 
-	scores_l = score_result['Scores']
+	scores_list = score_result['Scores']
+	last_year_scores_to_use = last_year_results['Scores'][:len(scores_list)]
 
-	average = round(mean(scores_l), 2)
+	player_average = round(mean(scores_list), 2)
 
 	# Don't want to return e.g 20.0, but do want to return e.g 20.5
 	# So if the value is x.0, then just cast to int
-	if isinstance(average, int):
-		average = int(average)
+	if isinstance(player_average, int):
+		player_average = int(player_average)
 
-	best = max(scores_l)
-	worst = min(scores_l)
+	best = max(scores_list)
+	worst = min(scores_list)
 
-	s_stats = [average, best, worst]
+	s_stats = [player_average, best, worst]
 
-	return render_template('curUserStats.html', scores_l=scores_l, colour=custom_colours_dict[curr_user],
-						   curr_user=curr_user, score_stats=s_stats)
-
-
-def pie_chart(graph_usernames, custom_colours, graph_scores):
-
-	pie_img = BytesIO()
-
-	fig1, ax1 = plt.subplots()
-
-	# pie chart
-	ax1.pie(graph_scores, labels=graph_usernames, startangle=90, colors=custom_colours)
-	# Equal aspect ratio ensures that pie is drawn as a circle.
-	ax1.axis('equal')
-
-	plt.savefig(pie_img, format='png')
-	plt.close()
-	pie_img.seek(0)
-	pie_url = b64encode(pie_img.getvalue()).decode('utf8')
-
-	return pie_url
-
-
-def barh_chart(graph_usernames, custom_colours, graph_scores):
-	barh_img = BytesIO()
-
-	# Horizontal bar chart
-	plt.barh(graph_usernames, graph_scores, color=custom_colours)
-	plt.savefig(barh_img, format='png')
-	plt.close()
-	barh_img.seek(0)
-
-	return b64encode(barh_img.getvalue()).decode('utf8')
-
+	return render_template('curUserStats.html', scores_list=scores_list, colour=custom_colours_dict[curr_user],
+						   curr_user=curr_user, score_stats=s_stats, last_year_scores_to_use=last_year_scores_to_use)
 
 def barv_chart(graph_usernames, score_result):
 
@@ -276,10 +243,10 @@ def barv_chart(graph_usernames, score_result):
 	labels = list(f"{i} ({score_result[i]['Average']})" for i in graph_usernames)
 
 	# Gets the average score for each user
-	all_avg_lis = all_average()
-	avg_of_avg = round(mean(all_avg_lis), 2)
+	all_averages_list = all_average()
+	average_of_average = round(mean(all_averages_list), 2)
 
-	return [labels, all_avg_lis, avg_of_avg]
+	return [labels, all_averages_list, average_of_average]
 
 
 def overall_avgs_chart(graph_usernames, score_result):
@@ -299,7 +266,7 @@ def overall_avgs_chart(graph_usernames, score_result):
 @app.route(f"/overall/stats")
 def overall_stats():
 	# Data for the overall stats page
-	score_result = get_required_data()
+	score_result = get_required_data(year=current_year)
 	usernames = list(score_result.keys())
 
 	custom_colours_dict = get_required_data(parent_dir="Colours")
@@ -322,35 +289,35 @@ def overall_stats():
 						   labels=usernames, values=graph_scores, line_graph_dict=line_graph_dict, colours=cust_colours,
 						   col_dict=custom_colours_dict)
 
-
-@app.route('/<string:variable>/', methods=['POST'])
-def get_js(variable):
-	js_variable = variable
-	firebase.put(f"/pubquiztracker/Colours", session['username'], f"#{js_variable}")
-	flash("Score entered!", "success")
-	return redirect(url_for("register"))
-
 @app.route("/alter/score", methods=["GET", "POST"])
 def alter_scores():
 	if request.method == "POST":
-		return delete_score()
+		return craig_function_delete_score()
 
 	if request.method == "GET":
 		curr_user = session['username']
-		score_result = get_required_data(user_name=curr_user)
+		score_result = get_required_data(year=current_year, user_name=curr_user)
 
 		score_to_delete = score_result['Scores'][-1]
 
 		return render_template("alterScore.html", num_rows=1, curr_user=curr_user, score_to_delete=score_to_delete)
 
-def delete_score():
-	result = firebase.get(f"/pubquiztracker/Scores/{session['username']}", "")
-	# Remove last score
-	result['Scores'] = result['Scores'][:-1]
-	# Reduce num of entries
-	result['num_entries'] = result['num_entries']-1
+def craig_function(user_JSON):
+	user_JSON_updated = user_JSON
+	user_JSON_updated['Scores'] = user_JSON['Scores'][:-1]
+	user_JSON_updated['Average'] =  round(mean(user_JSON['Scores']), 2)
+	user_JSON_updated['num_entries'] = len(user_JSON['Scores'])
 
-	firebase.put(f"/pubquiztracker/Scores", session['username'], result)
+	return user_JSON_updated
+
+def craig_function_delete_score():
+	user_JSON = get_required_data(year=current_year, user_name=session['username'])
+	user_JSON_updated = craig_function(user_JSON)
+
+
+	firebase.put(f"/pubquiztracker/{current_year}/Scores", session["username"], user_JSON_updated)
+
+	# firebase.put(f"/pubquiztracker/{current_year}/Scores", session['username'], result)
 	return dashboard("Score deleted!")
 
 if __name__ == "__main__":
