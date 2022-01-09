@@ -2,7 +2,7 @@ from flask import Flask, render_template, flash, redirect, url_for, session, req
 from firebase import firebase
 from datetime import date as sys_date
 from wtforms import Form, IntegerField, PasswordField, StringField, validators
-from wtforms.fields import EmailField, DateField
+from wtforms.fields.html5 import EmailField, DateField
 from passlib.hash import sha256_crypt
 from functools import wraps
 from flask_cors import CORS
